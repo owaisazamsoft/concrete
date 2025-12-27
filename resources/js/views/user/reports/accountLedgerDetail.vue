@@ -49,12 +49,12 @@
                 <div style="width: 100px;" class="px-3"  >{{ balance }}</div>
               </div>
   
-              <custom-pagination
+              <!-- <custom-pagination
                 :loading="loading"
                 v-model:page="filter.page"
                 :lastPage="last_page"
                 @page-changed="loadItems"
-              />
+              /> -->
             </template>
 
           </v-data-table-server>

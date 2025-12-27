@@ -48,21 +48,23 @@ class ReportService
      public static function getCustomerLeder($customerId)
     {
 
-            $billsQuery = DB::table('sale_invoices')
+            $billsQuery = DB::table('delivery_notes')
             ->select(
-                'sale_invoices.id',
+                'delivery_notes.id',
 
-                'sale_invoices.date',
+                'delivery_notes.date',
                 
                 DB::raw("'sale' AS type"),
                 
-                'sale_invoices.remarks',
+                'delivery_notes.remarks',
 
                 DB::raw("0 AS credit"),
                 
-                'sale_invoices.total AS debit'
+                'delivery_notes.total AS debit'
 
-            )->where('sale_invoices.user_id',$customerId);
+            )->where('delivery_notes.user_id',$customerId);
+
+            
 
 
             $paymentsQuery = DB::table('payments')

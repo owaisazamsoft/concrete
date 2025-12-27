@@ -34,7 +34,9 @@ class ReportController extends Controller
 
                  DB::raw("(SELECT SUM(credit) FROM payments WHERE payments.user_id = users.id ) AS payments_credit"),
 
-                 DB::raw("(SELECT SUM(debit) FROM payments WHERE payments.user_id = users.id ) AS payments_debit")
+                 DB::raw("(SELECT SUM(debit) FROM payments WHERE payments.user_id = users.id ) AS payments_debit"),
+
+                 DB::raw("(SELECT SUM(total) FROM delivery_notes WHERE delivery_notes.user_id = users.id ) AS dc")
                    
                 ])
                 ->orderByDesc('id')
@@ -47,6 +49,9 @@ class ReportController extends Controller
                     $balance =  $balance - $item->bills;
                     $balance =  $balance + $item->payments_credit;
                     $balance =  $balance - $item->payments_debit;
+
+                    $balance =  $balance + $item->dc;
+
                     $item->balance = $balance;
                     return $item;
 
@@ -82,13 +87,13 @@ class ReportController extends Controller
         $data = $query->select([
                     '*'                       
             ])
-            ->orderByDesc('id')
-            ->skip($offset)
-            ->take($length)
+            ->orderBy('date')
+            // ->skip($offset)
+            // ->take($length)
             ->get()
             ->map(function($item) use(&$balance) {
 
-                
+                $item->date = date('d-M-Y', strtotime($item->date));
                 // Convert values to numbers
                 $credit = floatval($item->credit);
                 $debit = floatval($item->debit);
