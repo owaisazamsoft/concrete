@@ -16,9 +16,9 @@
             <v-text-field v-model="form.date" type="date" label="Date" />
           </v-col>
 
-          <v-col cols="12" sm="4">
+          <!-- <v-col cols="12" sm="4">
             <v-text-field v-model="form.due_date" type="date" label="Due Date" />
-          </v-col>
+          </v-col> -->
 
           <v-col cols="12" sm="4">
             <v-text-field v-model="form.remarks" label="Remarks" />
@@ -69,11 +69,11 @@
           </v-col>
 
           <v-col cols="3">
-            <v-text-field label="Discount %" v-model="form.discount" />
+            <v-text-field label="Discount" v-model="form.discount" />
           </v-col>
 
           <v-col cols="3">
-            <v-text-field label="Tax %" v-model="form.tax" />
+            <v-text-field label="Tax" v-model="form.tax" />
           </v-col>
 
           <v-col cols="3">
@@ -216,8 +216,8 @@ export default {
     },
 
     grandTotal() {
-      const disc = (this.subtotal * this.form.discount) / 100
-      const tax = ((this.subtotal - disc) * this.form.tax) / 100
+      const disc =this.form.discount
+      const tax = this.form.tax
       return (this.subtotal - disc + tax).toFixed(2)
     }
   }

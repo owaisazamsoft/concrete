@@ -13,7 +13,7 @@
     <v-col cols="2">
       <v-text-field
         :model-value="deliveryNoteTotal(item)"
-        label="DN Total"
+        label="Total"
         density="compact"
         disabled
       />

@@ -11,16 +11,16 @@
             <v-row class="pt-3">
               <v-col cols="12" sm="4">
         
-                <v-text-field v-model="form.ref" label="Reference"clearable persistent-placeholder=""/>
+                <v-text-field v-model="form.ref" label="Reference" clearable persistent-placeholder=""/>
               </v-col>
               <v-col cols="12" sm="4">
           
                 <v-text-field v-model="form.date" type="date" label="Date"clearable persistent-placeholder=""/>
               </v-col>
-              <v-col cols="12" sm="4">
+              <!-- <v-col cols="12" sm="4">
 
                 <v-text-field v-model="form.due_date" type="date" label="Due Date"clearable persistent-placeholder="" />
-              </v-col>
+              </v-col> -->
               
               <v-col cols="12" sm="4">
           
@@ -34,7 +34,7 @@
                   item-title="label"
                   item-value="value"
                   label="Status"
-                  clearable
+                  clearable persistent-placeholder=""
                 />
               </v-col>
 
@@ -48,6 +48,7 @@
                 <UserDropdown
                       v-model="form.user_id"
                       label="Users"
+                      persistent-placeholder=""
                   />
               </v-col>
 
@@ -218,13 +219,13 @@ computed: {
 
   invoiceDiscountAmount() {
     const discountPercent = Number(this.form.discount || 0);
-    return (this.subtotal * discountPercent) / 100;
+    return  discountPercent ;
   },
 
 
   invoiceTaxAmount() {
     const taxPercent = Number(this.form.tax || 0);
-    return ((this.subtotal - this.invoiceDiscountAmount) * taxPercent) / 100;
+    return taxPercent;
   },
 
 

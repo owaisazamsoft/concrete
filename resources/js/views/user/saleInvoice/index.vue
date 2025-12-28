@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-card title="Sale Order" subtitle="View All Sale Order Details">
+      <v-card title="Sale Invoice" subtitle="View All Sale Invoice Details">
         <v-card class="" outlined>
           <v-card-text>
 
@@ -69,7 +69,7 @@
                 color="success" 
                 variant="flat" 
                 prepend-icon="mdi-plus" 
-                :to="`/user/saleorder/create`"></v-btn>
+                :to="`/user/saleInvoice/create`"></v-btn>
            
               </v-col>
           </v-card-text>
@@ -109,7 +109,7 @@
           >
  
             <template #item.actions="{ item }">
-              <v-btn color="warning" variant="flat" :to="`/user/saleorder/edit/${item.id}`">
+              <v-btn color="warning" variant="flat" :to="`/user/saleInvoice/edit/${item.id}`">
                 <v-icon>mdi-square-edit-outline</v-icon>
               </v-btn>
               <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
@@ -128,10 +128,24 @@
                 {{ item.status == 1 ? 'Active' : 'Deactive' }}
               </v-chip>
             </template>
+            <template #item.is_paid="{ item }">
+              <v-chip :color="item.is_paid == 1 ? 'green' : 'red'" size="small" dark>
+                {{ item.is_paid == 1 ? 'Paid' : 'Unpaid' }}
+              </v-chip>
+            </template>
 
             <template #item.delivery_note="{ item }">
-              {{ item.delivery_note.join(', ') }}
+              <div v-if="item.items?.length">
+                <div
+                  v-for="(it, index) in item.items"
+                  :key="index"
+                >
+                  {{ it.delivery_note?.ref || '-' }}
+                </div>
+              </div>
+              <span v-else>-</span>
             </template>
+
 
                 <template v-slot:bottom>
               <custom-pagination
@@ -178,15 +192,13 @@ export default {
           value: "date",
           format: (value) => value ? value.split(' ')[0] : ''
         },
-        { 
-          title: "Due Date", 
-          value: "due_date",
-          format: (value) => value ? value.split(' ')[0] : ''
-        },
+
+        { title: "User", value: "user" },
+        { title: "Delivery Note", value: "delivery_note" },
         { title: "Ref", value: "ref" },
         { title: "Remarks", value: "remarks" },
-        { title: "paid", value: "is_paid" },
-        { title: "User", value: "user" },
+        { title: "Paid Status", value: "is_paid" },
+        { title: "Status", value: "status" },
         { title: "Total", value: "total" },
         { title: "Actions", value: "actions", sortable: false },
       ],
