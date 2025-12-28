@@ -9,6 +9,7 @@
       <productDropDown
         v-model="item.product_id"
         label="Product"
+        persistent-placeholder=""
       />
     </v-col>
     <v-col cols="6" md="1">
@@ -17,6 +18,7 @@
         label="Qty"
         type="number"
         density="compact"
+        persistent-placeholder=""
       />
     </v-col>
     <v-col cols="6" md="2">
@@ -25,6 +27,7 @@
         label="Price"
         type="number"
         density="compact"
+        persistent-placeholder=""
       />
     </v-col>
     <v-col cols="6" md="2">
@@ -33,6 +36,8 @@
         label="Discount"
         type="number"
         density="compact"
+        persistent-placeholder=""
+        
       />
     </v-col>
     <v-col cols="6" md="2">
@@ -41,6 +46,7 @@
         label="Tax"
         type="number"
         density="compact"
+        persistent-placeholder=""
       />
     </v-col>
     <v-col cols="6" md="2">

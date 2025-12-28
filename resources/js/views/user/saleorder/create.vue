@@ -31,6 +31,7 @@
                 item-title="label"
                 item-value="value"
                 label="Status"
+                persistent-placeholder=""
                 clearable
               />
 
@@ -51,25 +52,24 @@
         <InvoiceItemsSection :items="form.items" @add="addItem" @remove="removeItem" />
       </v-card-text>
     </v-card>
-    <v-card :loading="loading" :disabled="loading" class="mt-3" title="Invoice Total">
+    <v-card class="mt-3" title="Invoice Total">
       <v-card-text>
-        <v-row class="mb-2">
-            <v-col  cols="12" sm="3" >
-                <label class="form-label">Subtotal</label>
-                <v-text-field disabled="true" :model-value="subtotal" />
-            </v-col>
-            <v-col cols="6" sm="3" >
-                <label class="form-label">Discount</label>
-                <v-text-field  v-model="form.discount" />
-            </v-col>
-            <v-col cols="6" sm="3" >
-              <label class="form-label">Tax</label>
-                <v-text-field  v-model="form.tax" />
-            </v-col>
-            <v-col cols="6" sm="3" >
-              <label class="form-label">Grand Total</label>
-                <v-text-field disabled="true" :model-value="grandTotal" />
-            </v-col>
+        <v-row>
+          <v-col cols="12" sm="3">
+            <v-text-field label="Subtotal" :model-value="subtotal" disabled />
+          </v-col>
+
+          <v-col cols="12" sm="3">
+            <v-text-field v-model="form.discount" label="Discount" />
+          </v-col>
+
+          <v-col cols="12" sm="3">
+            <v-text-field v-model="form.tax" label="Tax" />
+          </v-col>
+
+          <v-col cols="12" sm="3">
+            <v-text-field label="Grand Total" :model-value="grandTotal" disabled />
+          </v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -102,7 +102,7 @@ export default {
         date: "",
         ref: "",
         remarks: "",
-        status: "",
+        status: null,
         discount: 0,
         tax: 0,
         user_id: null,
@@ -200,12 +200,12 @@ async submitForm() {
     },
     invoiceDiscountAmount() {
       const discountPercent = Number(this.form.discount || 0);
-      return (this.subtotal * discountPercent) / 100;
+      return  discountPercent;
     },
 
     invoiceTaxAmount() {
       const taxPercent = Number(this.form.tax || 0);
-      return ((this.subtotal - this.invoiceDiscountAmount) * taxPercent) / 100;
+      return   taxPercent;
     },
 
     grandTotal() {

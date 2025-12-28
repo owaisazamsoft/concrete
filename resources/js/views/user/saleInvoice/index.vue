@@ -1,9 +1,9 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-card title="Sale Invoice" subtitle="View All Sale Invoice Details">
-        <v-card class="mb-4" outlined>
-  <v-card-text>
+      <v-card title="Sale Order" subtitle="View All Sale Order Details">
+        <v-card class="" outlined>
+          <v-card-text>
 
             <v-row dense>
               <v-col cols="12" md="4">
@@ -19,18 +19,42 @@
               <v-col cols="12" md="4">
                 <v-text-field
                   v-model="filter.date"
-                  label="Date"
+                  label="Start Date"
                   type="date"
                   density="compact"
                 />
               </v-col>
-              <v-col cols="3" sm="4">
-              <UserDropdown
-                    v-model="filter.user_id"
-                    label="Users"
-                    clearable persistent-placeholder=""
+         
+              <v-col cols="12" md="4">
+                <v-text-field
+                  v-model="filter.date"
+                  label="End Date"
+                  type="date"
+                  density="compact"
                 />
-            </v-col>
+              </v-col>
+             </v-row>
+              <v-row dense class="mt-2">
+                <v-col cols="3" sm="4">
+                    <UserDropdown
+                        v-model="filter.user_id"
+                        label="Users"
+                        clearable persistent-placeholder=""
+                    />
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-select
+                    v-model="filter.status"
+                    :items="statusItems"
+                    item-title="label"
+                    item-value="value"
+                    label="Status"
+                    clearable persistent-placeholder=""
+                  />
+
+                </v-col>
+              </v-row>
+           
               <v-col cols="12" class="text-center mt-3">
                 <v-btn
                   color="primary"
@@ -45,73 +69,71 @@
                 color="success" 
                 variant="flat" 
                 prepend-icon="mdi-plus" 
-                :to="`/user/saleInvoice/create`"></v-btn>
+                :to="`/user/saleorder/create`"></v-btn>
            
               </v-col>
-
-            </v-row>
-
           </v-card-text>
         </v-card>
         <v-card-text>
-          <v-data-table-server class="border striped-table"
+          <v-row class="mb-2">
+            <v-col cols="12" class="d-flex align-center flex-wrap">
+              <v-select
+                v-model="filter.length"
+                :items="[10, 20, 50, 100]"
+                density="compact"
+                variant="outlined"
+                max-width="120"
+                class="mr-3"
+                label="Per Page"
+                @change="loadItems"
+              />
+              <div class="align-self-center">
+                Showing {{ filter.offset + 1 }} - {{ Math.min(filter.offset + items.length, total) }} of {{ total }} Records
+              </div>
+
+              <v-spacer />
+            </v-col>
+          </v-row>
+
+
+          <v-data-table-server
             :headers="headers"
             :items="items"
-            :items-length="totalItems"
+            :items-length="total"
             :loading="loading"
-            item-value="id"
+            v-model:page="filter.page"
+            :items-per-page="filter.length"
+            :items-per-page-options="[10, 20, 50, 100]"
+       
             @update:options="loadItems"
           >
-          <template #item.actions="{ item }">
-            <v-btn
-              color="warning"
-              variant="flat"
-              :to="`/user/saleInvoice/edit/${item.id}`"
-              size="small"
-            >
-              <v-icon>mdi-square-edit-outline</v-icon>
-            </v-btn>
-
-            <span class="px-1"></span>
-            <v-btn
-              color="primary"
-              variant="flat"
-              size="small"
-              @click="printInvoice(item.id)"
-            >
-              <v-icon>mdi-printer</v-icon>
-            </v-btn>
-
-            <span class="px-1"></span>
-            <v-btn
-              color="danger"
-              variant="flat"
-              size="small"
-              @click="deleteItem(item.id)"
-            >
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </template>
-
-
-              <template #item.is_paid="{ item }">
-                <v-chip
-                  :color="item.is_paid == 1 ? 'green' : 'red'"
-                  dark
-                  small
-                >
-                  {{ item.is_paid == 1 ? 'Paid' : 'Unpaid' }}
-                </v-chip>
-              </template>
-
-            <template #item.user="{item}">
-                <span class="font-weight-medium">
-                  {{ item.user?.firstName || '-' }}
-                  {{ item.user?.surname || '' }}
-                </span>
+ 
+            <template #item.actions="{ item }">
+              <v-btn color="warning" variant="flat" :to="`/user/saleorder/edit/${item.id}`">
+                <v-icon>mdi-square-edit-outline</v-icon>
+              </v-btn>
+              <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
             </template>
 
-            <template v-slot:bottom>
+ 
+            <template #item.user="{ item }">
+              {{ item.user?.firstName || '-' }} {{ item.user?.surname || '' }}
+            </template>
+
+     
+            <template #item.status="{ item }">
+              <v-chip :color="item.status == 1 ? 'green' : 'red'" size="small" dark>
+                {{ item.status == 1 ? 'Active' : 'Deactive' }}
+              </v-chip>
+            </template>
+
+            <template #item.delivery_note="{ item }">
+              {{ item.delivery_note.join(', ') }}
+            </template>
+
+                <template v-slot:bottom>
               <custom-pagination
                 :loading="loading"
                 v-model:page="filter.page"
@@ -121,23 +143,32 @@
             </template>
           </v-data-table-server>
         </v-card-text>
+
       </v-card>
     </v-col>
   </v-row>
 </template>
 
 <script>
-import saleInvoiceModel from "@/models/saleInvoice.model";
+import generaApi from "@/models/general.model"
 import UserDropdown from "@/components/UserDropdown.vue"
 export default {
-    components: {
+  components: {
     UserDropdown
   },
   data() {
     return {
-      filter: { search: "", length: 10, page: 1, offset: 0 },
+      
+      filter: {   search: "", 
+        length: 10, 
+        page: 1, 
+        offset: 0, 
+        start_date: "", 
+        end_date: "", 
+        user_id: null, 
+        status: null  },
       items: [],
-      totalItems: 0,
+      total: 0,
       last_page: 1,
       loading: false,
       headers: [
@@ -159,34 +190,58 @@ export default {
         { title: "Total", value: "total" },
         { title: "Actions", value: "actions", sortable: false },
       ],
+      url :"/api/saleInvoice/",
+      statusItems: [
+        { label: "Active ", value: 1 },
+        { label: "Deactive", value: 0 },
+        ],
     };
   },
   mounted() {
     this.loadItems();
   },
   methods: {
-    async loadItems() {
-      this.loading = true;
-      try {
-        const res = await saleInvoiceModel.all(this.filter);
-        this.items = res.data;
-        this.totalItems = res.total;
-        this.last_page = res.last_page;
-        this.filter.page = Number(res.page);
-        this.filter.offset = res.offset;
-      } catch (error) {
-        this.items = [];
-        this.totalItems = 0;
-      } finally {
-        this.loading = false;
-      }
-    },
+   
+  async loadItems(options = {}) {
+    this.loading = true;
+
+    try {
+      if (options.page) this.filter.page = options.page;
+      if (options.itemsPerPage) this.filter.length = options.itemsPerPage;
+
+      const params = {
+        page: this.filter.page,
+        per_page: this.filter.length,
+        search: this.filter.search,
+        start_date: this.filter.start_date,
+        end_date: this.filter.end_date,
+        user_id: this.filter.user_id,
+        status: this.filter.status,
+      };
+
+      const res = await generaApi.getAndfind(this.url, params);
+
+      this.items = res.data;         
+      this.total = res.total;   
+      this.last_page = res.last_page;
+      this.filter.page = res.current_page;
+      this.filter.offset = res.from - 1 || 0;
+    } catch (error) {
+      this.items = [];
+      this.total = 0;
+      this.last_page = 1;
+    } finally {
+      this.loading = false;
+    }
+  },
+
     async deleteItem(id) {
         if (!confirm("Are you sure you want to delete this item?")) return;
 
         this.loading = true;
         try {
-        const res = await saleInvoiceModel.delete(id);
+        const deleteurl = this.url+id
+        const res = await generaApi.delete(deleteurl);
 
         this.$alertStore.add(res.message || "Sale Invoice deleted", "success");
         this.loadItems(); 

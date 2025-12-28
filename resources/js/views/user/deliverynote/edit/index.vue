@@ -37,11 +37,13 @@
               v-model="form.user_id"
               label="User"
               learable persistent-placeholder=""
+              disabled
             />
           </v-col>
         </v-row>
       </v-card-text>
     </v-card>
+
 
 
     <v-card class="mt-3" title="Item List">
@@ -54,7 +56,17 @@
       </v-card-text>
     </v-card>
 
+    <v-card class="mt-3" title="Invoice Total">
+      <v-card-text>
+        <v-row>
+          <v-col cols="12" sm="3">
+            <v-text-field label="Total" :model-value="subtotal" disabled />
+          </v-col>
 
+
+        </v-row>
+      </v-card-text>
+    </v-card>
 
     <div class="text-center mt-4">
       <v-btn color="primary" @click="updateForm">
@@ -190,7 +202,18 @@ export default {
   },
 
   computed: {
+    subtotal() {
+      return this.form.items.reduce((sum, item) => {
+        const qty = Number(item.quantity || 0);
+        const price = Number(item.price || 0);
+       
 
+        const itemBase = qty * price;
+        const itemTotal = itemBase ;
+
+        return sum + itemTotal;
+      }, 0);
+    },
   },
 };
 </script>

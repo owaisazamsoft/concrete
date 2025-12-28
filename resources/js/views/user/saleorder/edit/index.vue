@@ -37,6 +37,7 @@
               v-model="form.user_id"
               label="User"
               learable persistent-placeholder=""
+              disabled
             />
           </v-col>
         </v-row>
@@ -54,7 +55,7 @@
       </v-card-text>
     </v-card>
 
-    <!-- TOTAL -->
+
     <v-card class="mt-3" title="Invoice Total">
       <v-card-text>
         <v-row>
@@ -63,11 +64,11 @@
           </v-col>
 
           <v-col cols="12" sm="3">
-            <v-text-field v-model="form.discount" label="Discount (%)" />
+            <v-text-field v-model="form.discount" label="Discount" />
           </v-col>
 
           <v-col cols="12" sm="3">
-            <v-text-field v-model="form.tax" label="Tax (%)" />
+            <v-text-field v-model="form.tax" label="Tax" />
           </v-col>
 
           <v-col cols="12" sm="3">
@@ -212,19 +213,36 @@ export default {
 
   computed: {
     subtotal() {
-      return this.form.items.reduce((sum, i) => {
-        return sum + (i.quantity * i.price - i.discount + i.tax);
+      return this.form.items.reduce((sum, item) => {
+        const qty = Number(item.quantity || 0);
+        const price = Number(item.price || 0);
+        const discount = Number(item.discount || 0);
+        const tax = Number(item.tax || 0);
+
+        const itemBase = qty * price;
+        const itemTotal = itemBase - discount + tax;
+
+        return sum + itemTotal;
       }, 0);
     },
     invoiceDiscountAmount() {
-      return (this.subtotal * this.form.discount) / 100;
+      const discountPercent = Number(this.form.discount || 0);
+      return  discountPercent;
     },
+
     invoiceTaxAmount() {
-      return ((this.subtotal - this.invoiceDiscountAmount) * this.form.tax) / 100;
+      const taxPercent = Number(this.form.tax || 0);
+      return   taxPercent;
     },
+
     grandTotal() {
-      return (this.subtotal - this.invoiceDiscountAmount + this.invoiceTaxAmount).toFixed(2);
-    },
+      return (
+        this.subtotal -
+        this.invoiceDiscountAmount +
+        this.invoiceTaxAmount
+      ).toFixed(2);
+    }
+
   },
 };
 </script>

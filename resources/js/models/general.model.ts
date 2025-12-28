@@ -19,6 +19,15 @@ export default class     {
 
     }
 
+    static async getAndfind(url:string, params:any) {
+        try {
+            const res = await api.get(url, { params });
+            return res.data;
+        } catch (error) {
+            throw await errorHandler(error);
+        }
+        }
+
     static async all(url: string, filter: any = {}) {
             try {
             const params = {

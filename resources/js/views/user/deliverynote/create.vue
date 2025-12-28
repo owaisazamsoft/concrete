@@ -31,14 +31,14 @@
                 item-title="label"
                 item-value="value"
                 label="Status"
-                clearable
+                clearable persistent-placeholder=""
               />
 
             </v-col>
             <v-col cols="3" sm="4">
               <UserDropdown
                     v-model="form.user_id"
-                    label="Users"
+                    label="Users" persistent-placeholder=""
                 />
             </v-col>
 
@@ -48,6 +48,18 @@
     <v-card :loading="loading" :disabled="loading" class="mt-3" title="Item List" >
       <v-card-text >
         <InvoiceItemsSection :items="form.items" @add="addItem" @remove="removeItem" />
+      </v-card-text>
+    </v-card>
+
+    <v-card class="mt-3" title="Invoice Total">
+      <v-card-text>
+        <v-row>
+          <v-col cols="12" sm="3">
+            <v-text-field label="Total" :model-value="subtotal" disabled />
+          </v-col>
+
+
+        </v-row>
       </v-card-text>
     </v-card>
 
@@ -79,7 +91,7 @@ export default {
         date: "",
         ref: "",
         remarks: "",
-        status: "",
+        status: null,
         discount: 0,
         tax: 0,
         user_id: null,
@@ -162,7 +174,18 @@ export default {
 
   },
   computed: {
+    subtotal() {
+      return this.form.items.reduce((sum, item) => {
+        const qty = Number(item.quantity || 0);
+        const price = Number(item.price || 0);
+       
 
+        const itemBase = qty * price;
+        const itemTotal = itemBase ;
+
+        return sum + itemTotal;
+      }, 0);
+    },
 
   }
 
