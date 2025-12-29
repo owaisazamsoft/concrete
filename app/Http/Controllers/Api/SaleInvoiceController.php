@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Mpdf\Mpdf;
 
 class SaleInvoiceController extends Controller
 {
@@ -58,7 +59,7 @@ class SaleInvoiceController extends Controller
         try {
 
             // $data = SaleInvoiceService::show($id,$request);
-              $data = SaleInvoice::with(['items.product', 'user'])
+              $data = SaleInvoice::with(['items.deliveryNote', 'user'])
             ->where('id', $id)
             ->first();
             if (!$data) {
@@ -74,6 +75,41 @@ class SaleInvoiceController extends Controller
                 'message' => $th->getMessage(),
             ], 500);
         }
+
+    }
+
+         public function print(Request $request,$id)
+    {
+     
+
+        // try {
+
+          
+            $data = SaleInvoice::with(['items.deliveryNote', 'user'])
+            ->where('id', $id)
+            ->first();
+            if (!$data) {
+                throw new \Exception("Record with ID $id not found");
+            }
+
+            // return view('saleInvoice',['data' => $data]);
+            $html = view('saleInvoice',['data' => $data])->render();
+            $mpdf = new Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+            ]);
+
+            $mpdf->WriteHTML($html);
+
+            return $mpdf->Output($data->id.'-SaleInvoice.pdf', 'D');
+
+    
+        // } catch (\Throwable $th) {
+          
+        //     return response()->json([
+        //         'message' => $th->getMessage(),
+        //     ], 500);
+        // }
 
     }
 

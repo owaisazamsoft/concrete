@@ -51,8 +51,11 @@ class SaleInvoiceService
             $query->whereDate('date', '<=', $value);
         })
         ->orderByDesc('date')
-        ->paginate($request->length ?? 10);
-    
+        ->paginate($request->length ?? 10)
+        ->through(function ($invoice) {
+            $invoice->date = date('d-M-Y', strtotime($invoice->date));
+            return $invoice;
+        });
     }
 
     static public function create($request)

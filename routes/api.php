@@ -18,6 +18,9 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SaleOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 
+
+Route::get('print/{id}', [SaleInvoiceController::class,'print']);
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -48,6 +51,8 @@ Route::apiResource('stockadjustment', StockAdjustmentController::class);
 
 Route::apiResource('saleOrder', SaleOrderController::class);
 Route::apiResource('deliveryNotes', DeliveryNoteController::class);
+
+Route::get('saleInvoice/print/{id}', [SaleInvoiceController::class,'print']);
 Route::apiResource('saleInvoice', SaleInvoiceController::class);
 
 

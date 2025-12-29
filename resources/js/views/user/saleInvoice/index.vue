@@ -109,9 +109,15 @@
           >
  
             <template #item.actions="{ item }">
+              
               <v-btn color="warning" variant="flat" :to="`/user/saleInvoice/edit/${item.id}`">
                 <v-icon>mdi-square-edit-outline</v-icon>
               </v-btn>
+
+                <v-btn target="_blank" color="success" variant="flat" :to="`/api/saleInvoice/print/${item.id}`">
+                <v-icon>mdi-eye</v-icon>
+              </v-btn>
+
               <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
@@ -196,7 +202,6 @@ export default {
         { title: "User", value: "user" },
         { title: "Delivery Note", value: "delivery_note" },
         { title: "Ref", value: "ref" },
-        { title: "Remarks", value: "remarks" },
         { title: "Paid Status", value: "is_paid" },
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },
