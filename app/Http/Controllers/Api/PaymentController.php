@@ -58,7 +58,8 @@ class PaymentController extends Controller
             'type' => 'required|in:debit,credit',
             'amount' => 'required|numeric|min:0',
             'user_id' =>['required','integer',Rule::exists('users','id')],
-            'remarks' => 'required|string|max:1000',
+            'remarks' => 'nullable|string|max:1000',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         if ($validator->fails()) {
@@ -79,6 +80,7 @@ class PaymentController extends Controller
         }
         $model->user_id = $request->user_id;
         $model->remarks = $request->remarks;
+        $model->description = $request->description;
         $model->save();
    
         return response()->json([
@@ -125,7 +127,8 @@ class PaymentController extends Controller
             'type' => 'required|in:debit,credit',
             'amount' => 'required|numeric|min:0',
             'user_id' =>['required',Rule::exists('users','id')],
-            'remarks' => 'required|string|max:1000',
+            'remarks' => 'nullable|string|max:1000',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         if ($validator->fails()) {
@@ -145,6 +148,7 @@ class PaymentController extends Controller
         }
         $model->user_id = $request->user_id;
         $model->remarks = $request->remarks;
+        $model->description = $request->description;
         $model->save();
         
         return response()->json([
