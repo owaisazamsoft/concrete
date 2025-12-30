@@ -37,8 +37,8 @@ class SaleInvoiceController extends Controller
          DB::beginTransaction();
         try {
 
-            DB::commit();
-            $data = SaleInvoiceService::create($request);
+             $data = SaleInvoiceService::create($request);
+             DB::commit();
             return response()->json([
                 'message' => "Record Created Successfuly",
                 'data' => $data
@@ -97,11 +97,18 @@ class SaleInvoiceController extends Controller
             $mpdf = new Mpdf([
                 'mode' => 'utf-8',
                 'format' => 'A4',
+             
             ]);
 
             $mpdf->WriteHTML($html);
 
-            return $mpdf->Output($data->id.'-SaleInvoice.pdf', 'D');
+            if(!$request->has('view')){
+                  return $mpdf->Output($data->id.'-SaleInvoice.pdf', 'I');
+            }else{
+                  return view('saleInvoice',['data' => $data]);
+            }
+
+          
 
     
         // } catch (\Throwable $th) {

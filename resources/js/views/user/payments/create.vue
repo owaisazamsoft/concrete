@@ -57,6 +57,15 @@
           />
         </v-col>
 
+        <v-col cols="12">
+          <label class="form-label">Description</label>
+          <v-text-field
+            v-model="form.description"
+            variant="outlined"
+            placeholder="Description"
+          />
+        </v-col>
+
          <div class="mt-3 text-center w-100">
                 <v-btn class="mr-1" color="primary" @click="submitForm">
                 Submit
@@ -92,6 +101,7 @@ export default {
       form: {
         type:null,
         date: "",
+        description:"",
         amount: "",
         remarks: "",
         user_id: null,
@@ -126,6 +136,7 @@ export default {
       this.form = {
         date: "",
         amount: "",
+        description:"",
         type:null,
         remarks:null,
         user_id: null,

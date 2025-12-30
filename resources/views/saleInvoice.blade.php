@@ -51,22 +51,54 @@
         font-weight: bold;
     }
 
+    .border{
+        border:1px solid black!important;
+    }
+
+    .top{
+        vertical-align: top;
+    }
+
+    .w-100{
+        width: 100%;
+    }
+
+    .block{
+        display: block;
+    }
+
 </style>
 </head>
 <body>
 
 <table class="no-border">
-<tr>
-    <td width="70%">
-        <h1>M. Tariq Machinery Bloks Work</h1>
-        <div>Specialist Machinery Block Manufactured with Stone Concrete</div>
-        <div>Plot # KC-972, Galli # 02, Ijtimah Gha Rod, Near Quetta Balochistan Hotel, Orangi</div>
-    </td>
-    <td class="right">
-        <b>Invoice</b><br>
-        NTN: -
-    </td>
-</tr>
+    <tr>
+        <td width="450px" class="" style="vertical-align: baseline">
+            <table width="100%" class="">
+                <tr>
+                    <td style="width: 60px;" >
+                        <img style="width:60px" 
+                        src="{{ !request()->has('view') 
+                                ? public_path('assets/images/invoice-logo.png') 
+                                : asset('assets/images/invoice-logo.png') }}" />
+                    </td>
+                    <td>
+                        <h1 style="font-size:16px;" >M. Tariq Machinery Blocks Works</h1>
+                        <div>Specialist Machinery Block Manufactured with Stone Concrete</div>
+                        <div>Plot # KC-972, Street No # 02, Ijtimah Gah Road, Near Quetta Balochistan Hotel, Orangi</div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td class="top right">
+            <div>Contact</div>
+            <div>M.tariq</div>
+            <div>0333-3315283 </div>
+            <div> 0301-2001477</div>
+            <div style="padding-top: 5px;" >M.arif</div>
+            <div> 0302-6841570</div>
+        </td>
+    </tr>
 </table>
 
 <br>
@@ -105,15 +137,10 @@
     <td width="20%" >
 
     </td>
-    <td width="30%" >
+    <td width="30%" class="top" >
          <table class="no-border" >
             <tr>
                 <td colspan="3" class="subheading">Invoice</td>
-            </tr>
-            <tr>
-                <td style="width: 90px;" ><b>Invoice Date</b></td>
-                <td style="width: 10px;">:</td>
-                <td>{{ date('d-M-Y',strtotime($data->date)) }} </td>
             </tr>
             <tr>
                 <td style="width: 90px;"><b>Invoice No</b></td>
@@ -121,10 +148,16 @@
                 <td>{{ $data->ref}}</td>
             </tr>
             <tr>
+                <td style="width: 90px;" ><b>Invoice Date</b></td>
+                <td style="width: 10px;">:</td>
+                <td>{{ date('d-M-Y',strtotime($data->date)) }} </td>
+            </tr>
+            
+            <!-- <tr>
                 <td style="width: 90px;"><b>P O No</b></td>
                 <td style="width: 10px;">:</td>
                 <td></td>
-            </tr>
+            </tr> -->
         </table>  
       </td>
     </tr>

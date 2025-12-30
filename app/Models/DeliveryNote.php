@@ -36,6 +36,17 @@ class DeliveryNote extends Model
     public function saleInvoiceItem() {
         return $this->belongsTo(SaleInvoiceItem::class, 'delivery_note_id');
     }
+
+     public function generatePrefix()
+    {
+
+        $sequence = InvoiceSequence::where('type', 'delivery_note')
+            ->lockForUpdate()
+            ->first();
+        $nextNumber =  $sequence->incrementSequence();
+        $this->prefix = 'DC-'. str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $this->save();
+    }
     
 
 }

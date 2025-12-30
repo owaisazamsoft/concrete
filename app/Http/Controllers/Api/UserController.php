@@ -45,7 +45,7 @@ class UserController extends Controller
             $data = $baseQuery->select([
                         '*'                       
                 ])
-                ->orderByDesc('id')
+                ->orderBy('firstName')
                 ->skip($offset)
                 ->take($length)
                 ->get();

@@ -55,6 +55,15 @@
             placeholder="Remarks"
           />
         </v-col>
+
+         <v-col cols="12">
+          <label class="form-label">Description</label>
+          <v-text-field
+            v-model="form.description"
+            variant="outlined"
+            placeholder="Description"
+          />
+        </v-col>
          <div  class="mt-3 text-center w-100">
             <v-btn class="mr-1" color="primary"  @click="submitForm">
                 Update
@@ -89,6 +98,7 @@ export default {
         date: "",
         amount:0,
         type:null,
+        description:"",
         remarks: "",
         user_id: null,
       },
@@ -118,6 +128,7 @@ export default {
         }
         this.form.type = data.type;
         this.form.remarks = data.remarks;
+        this.form.description = data.description;
         this.form.user_id = data.user_id;
 
       } catch (e) {

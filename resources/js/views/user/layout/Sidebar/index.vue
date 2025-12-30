@@ -8,8 +8,8 @@
         
         <v-list density="compact" class="ps" nav>
            
-            <v-list-item class="d-flex ps-5 pe-5" style="height: 57px;">
-                <img :src="logo" class="d-flex justify-center align-center" />
+            <v-list-item class="d-flex ps-5 pe-5 justify-center align-center" style="height: 100px;">
+                <img style="width: 100px;" :src="logo" />
             </v-list-item>
 
          
@@ -55,7 +55,7 @@
 import { useDisplay } from "vuetify";
 import { useThemeStore } from "@stores/themeStore";
 import Menus from "./menu";
-import logo from "@assets/images/logo/logo.png"
+import logo from "@assets/images/logo/logotest.png"
 export default {
     data() {
         return {

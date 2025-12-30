@@ -52,7 +52,11 @@ class SaleOrderService
             $query->whereDate('date', '<=', $value);
         })
         ->orderByDesc('date')
-        ->paginate($request->length ?? 10);
+        ->paginate($request->length ?? 10)
+        ->through(function ($invoice) {
+            $invoice->date = date('d-M-Y', strtotime($invoice->date));
+            return $invoice;
+        });
 
     }
 
@@ -72,6 +76,8 @@ class SaleOrderService
             'tax'      => $request->tax ?? 0,
             'total'    => 0,
         ]);
+
+         $order->generatePrefix();
 
         $subtotal = 0;
         foreach ($request->items as $key => $value) {

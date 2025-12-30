@@ -39,8 +39,9 @@ class SaleOrderController extends Controller
          DB::beginTransaction();
         try {
 
-            DB::commit();
+           
             $data = SaleOrderService::create($request);
+             DB::commit();
             return response()->json([
                 'message' => "Record Created Successfuly",
                 'data' => $data

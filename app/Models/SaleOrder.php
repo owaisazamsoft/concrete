@@ -39,6 +39,17 @@ class SaleOrder extends Model
     public function deliveryNote() {
         return $this->hasMany(DeliveryNote::class, 'sale_order_id');
     }
+
+    public function generatePrefix()
+    {
+
+        $sequence = InvoiceSequence::where('type', 'sale_order')
+            ->lockForUpdate()
+            ->first();
+        $nextNumber =  $sequence->incrementSequence();
+        $this->prefix = 'SO-'. str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $this->save();
+    }
     
     
 }

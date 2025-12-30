@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class SaleInvoice extends Model
 {
@@ -19,5 +20,18 @@ class SaleInvoice extends Model
     public function user() {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+
+      public function generatePrefix()
+    {
+
+        $sequence = InvoiceSequence::where('type', 'sale_invoice')
+            ->lockForUpdate()
+            ->first();
+        $nextNumber =  $sequence->incrementSequence();
+        $this->prefix = 'SI-'. str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $this->save();
+    }
     
+
 }

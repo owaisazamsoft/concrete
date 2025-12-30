@@ -77,6 +77,8 @@ class SaleInvoiceService
 
         $model->save();
 
+        $model->generatePrefix();
+
 
 
         $subtotal = 0;

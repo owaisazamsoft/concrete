@@ -43,9 +43,8 @@ class DeliveryNoteController extends Controller
     {
         DB::beginTransaction();
         try {
-
-            DB::commit();
             $data = DeliveryNoteService::create($request);
+             DB::commit();
             return response()->json([
                 'message' => "Record Created Successfuly",
                 'data' => $data
@@ -88,9 +87,8 @@ class DeliveryNoteController extends Controller
         DB::beginTransaction();
 
         try {
-
-            DB::commit();
             $data = DeliveryNoteService::update($id, $request);
+             DB::commit();
             return response()->json([
                 'message' => 'Record Updated',
                 'data' =>  $data
