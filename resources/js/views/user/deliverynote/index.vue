@@ -178,11 +178,11 @@ export default {
           value: "date",
           format: (value) => value ? value.split(' ')[0] : ''
         },
+        { title: "Invoice No", value: "prefix" },
         { title: "User", value: "user" },
-        { title: "Sale Order", value: "sale_order" },
         { title: "Sale Invoice", value: "sale_invoice_item" },
         { title: "Ref", value: "ref" },
-        { title: "Remarks", value: "remarks" },
+      
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },
         { title: "Actions", value: "actions", sortable: false },

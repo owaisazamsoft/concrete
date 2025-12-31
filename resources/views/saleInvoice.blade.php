@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,8 +41,7 @@
         padding-bottom: 2px;
     }
 
-    .subheading{
-  
+    .subheading{  
         background: #008000;
         color: white;
         padding: 3px 5px;
@@ -73,30 +71,30 @@
 
 <table class="no-border">
     <tr>
-        <td width="450px" class="" style="vertical-align: baseline">
+        <td width="500px" class="top" style="vertical-align: top">
             <table width="100%" class="">
                 <tr>
-                    <td style="width: 60px;" >
-                        <img style="width:60px" 
+                    <td style="width: 100px;" >
+                        <img style="width:100px" 
                         src="{{ !request()->has('view') 
                                 ? public_path('assets/images/invoice-logo.png') 
                                 : asset('assets/images/invoice-logo.png') }}" />
                     </td>
                     <td>
-                        <h1 style="font-size:16px;" >M. Tariq Machinery Blocks Works</h1>
-                        <div>Specialist Machinery Block Manufactured with Stone Concrete</div>
-                        <div>Plot # KC-972, Street No # 02, Ijtimah Gah Road, Near Quetta Balochistan Hotel, Orangi</div>
+                        <h1 >M. Tariq Machinery Blocks Works</h1>
+                        <div style="font-size:13px" >Specialist Machinery Block Manufactured with Stone Concrete</div>
+                        <div style="font-size:13px">Plot # KC-972, Street No # 02, Ijtimah Gah Road, Near Quetta Balochistan Hotel, Orangi</div>
                     </td>
                 </tr>
             </table>
         </td>
         <td class="top right">
-            <div>Contact</div>
-            <div>M.tariq</div>
-            <div>0333-3315283 </div>
-            <div> 0301-2001477</div>
-            <div style="padding-top: 5px;" >M.arif</div>
-            <div> 0302-6841570</div>
+            <div style="font-size:13px" >Contact</div>
+            <div style="font-size:13px">M.tariq</div>
+            <div style="font-size:13px">0333-3315283 </div>
+            <div style="font-size:13px"> 0301-2001477</div>
+            <div style="font-size:13px;padding-top: 5px;" >M.arif</div>
+            <div style="font-size:13px"> 0302-6841570</div>
         </td>
     </tr>
 </table>
@@ -145,7 +143,7 @@
             <tr>
                 <td style="width: 90px;"><b>Invoice No</b></td>
                 <td style="width: 10px;">:</td>
-                <td>{{ $data->ref}}</td>
+                <td>{{ $data->prefix}}</td>
             </tr>
             <tr>
                 <td style="width: 90px;" ><b>Invoice Date</b></td>
@@ -183,15 +181,15 @@
 
             <tr>
                 @if($key == 0)
-                <td rowspan="2" class="center" >{{ $i+1 }}</td>
+                    <td rowspan="{{$item->deliveryNote->items}}" class="center" >{{ $i+1 }}</td>
 
-                <td rowspan="2" class="center" >
-                {{ date('d-M-Y',strtotime($item->deliveryNote->date)) }} 
-                </td>
+                    <td rowspan="{{$item->deliveryNote->items}}" class="center" >
+                    {{ date('d-M-Y',strtotime($item->deliveryNote->date)) }} 
+                    </td>
 
-                 <td rowspan="2" class="center" >
-                
-                {{ $item->deliveryNote->ref }}</td>
+                    <td rowspan="{{$item->deliveryNote->items}}" class="center" >
+                    
+                    {{ $item->deliveryNote->ref }}</td>
                 @endif
                
                 <td class="" >{{ $dc->product->title }} ({{ $dc->product->unit->title }})</td>
@@ -217,7 +215,11 @@
         <td class="right">0</td>
     </tr> -->
     <tr class="bold">
-        <td style="border-bottom: 0px;border-left:0px" colspan="5" ></td>
+        <td style="border-bottom: 0px;border-left:0px" colspan="5" > 
+
+     
+        
+        </td>
         <th class="center">Total</th>
         <td class="center">{{ number_format($data->total,2) }}</td>
     </tr>

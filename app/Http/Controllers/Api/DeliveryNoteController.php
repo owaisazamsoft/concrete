@@ -63,9 +63,11 @@ class DeliveryNoteController extends Controller
           $data = DeliveryNote::with(['items.product', 'user'])
             ->where('id', $id)
             ->first();
-            if (!$data) {
+            if(!$data) {
                 throw new \Exception("Record with ID $id not found");
             }
+
+            $data->date = date('Y-m-d',strtotime($data->date));
 
         try {
             return response()->json([

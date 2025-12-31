@@ -198,10 +198,8 @@ export default {
           value: "date",
           format: (value) => value ? value.split(' ')[0] : ''
         },
-
+        { title: "Invoice No", value: "prefix" },
         { title: "User", value: "user" },
-        { title: "Delivery Note", value: "delivery_note" },
-        { title: "Ref", value: "ref" },
         { title: "Paid Status", value: "is_paid" },
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },

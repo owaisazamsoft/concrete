@@ -43,12 +43,15 @@ class SaleOrder extends Model
     public function generatePrefix()
     {
 
-        $sequence = InvoiceSequence::where('type', 'sale_order')
-            ->lockForUpdate()
-            ->first();
-        $nextNumber =  $sequence->incrementSequence();
-        $this->prefix = 'SO-'. str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $sequence = InvoiceSequence::where('type', 'sale_order')->first();
+        $last_number = $sequence->last_number + 1;
+        $this->prefix = 'SO-'.date('y').str_pad($last_number, 4, '0', STR_PAD_LEFT);
         $this->save();
+
+         InvoiceSequence::where('type', 'sale_order')->update([
+            'last_number' => $last_number,
+         ]);
+
     }
     
     

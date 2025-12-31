@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('invoice_sequences', function (Blueprint $table) {
             $table->id();
-            $table->string('type')->unique();
-            $table->unsignedBigInteger('last_number');
+            $table->string('type');
+            $table->integer('last_number');
             $table->timestamps();
         });
     }

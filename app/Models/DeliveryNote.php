@@ -40,12 +40,16 @@ class DeliveryNote extends Model
      public function generatePrefix()
     {
 
-        $sequence = InvoiceSequence::where('type', 'delivery_note')
-            ->lockForUpdate()
-            ->first();
-        $nextNumber =  $sequence->incrementSequence();
-        $this->prefix = 'DC-'. str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $sequence = InvoiceSequence::where('type', 'delivery_note')->first();
+        $last_number = $sequence->last_number + 1;
+
+        $this->prefix = 'DC-'.date('y').str_pad($last_number, 4, '0', STR_PAD_LEFT);
         $this->save();
+
+        InvoiceSequence::where('type', 'delivery_note')->update([
+            'last_number' => $last_number
+        ]);
+
     }
     
 
