@@ -56,7 +56,7 @@
       </v-card-text>
     </v-card>
 
-    <v-card class="mt-3" title="Invoice Total">
+    <v-card class="mt-3" title="Total">
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="3">

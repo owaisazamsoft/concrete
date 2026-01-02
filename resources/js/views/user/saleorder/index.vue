@@ -1,7 +1,53 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-card title="Sale Order" subtitle="View All Sale Order Details">
+      <v-card>
+        <v-card-title class="d-flex align-center justify-space-between">
+          <div>
+            <div class="text-h6">Sale Order</div>
+            <div class="text-caption text-grey">
+              View All Sale Order Details
+            </div>
+          </div>
+          <v-menu location="bottom end">
+            <template #activator="{ props }">
+              <v-btn
+                icon="mdi-dots-vertical"
+                variant="text"
+                v-bind="props"
+              />
+            </template>
+
+              <v-list>
+                <v-list-item :to="`/user/saleorder/create`">
+                  <v-list-item-title class="d-flex align-center">
+                    <v-icon size="18" class="me-2">mdi-plus</v-icon>
+                    Create
+                  </v-list-item-title>
+                </v-list-item>
+
+                <v-list-item @click="reloadPage">
+                  <v-list-item-title class="d-flex align-center text-primary">
+                    <v-icon size="18" class="me-2" color="blue">mdi-reload</v-icon>
+                    Reload
+                  </v-list-item-title>
+                </v-list-item>
+
+                <v-list-item @click="deleteSelected">
+                  <v-list-item-title class="d-flex align-center text-red">
+                    <v-icon size="18" class="me-2" color="red">mdi-delete</v-icon>
+                    Delete Selected
+                  </v-list-item-title>
+                </v-list-item>
+        
+              </v-list>
+
+          </v-menu>
+        </v-card-title>
+
+
+
+
         <v-card class="" outlined>
           <v-card-text>
 
@@ -42,7 +88,7 @@
                         clearable persistent-placeholder=""
                     />
                 </v-col>
-                <v-col cols="12" sm="4">
+                <v-col cols="3" sm="4">
                   <v-select
                     v-model="filter.status"
                     :items="statusItems"
@@ -51,8 +97,21 @@
                     label="Status"
                     clearable persistent-placeholder=""
                   />
-
                 </v-col>
+                <v-col cols="3" sm="4">
+                  <v-select
+                    v-model="filter.length"
+                    :items="[10, 20, 50, 100]"
+                    density="compact"
+                    variant="outlined"
+                   
+                    label="Per Page"
+                    @change="loadItems"
+                  />
+                </v-col>
+              
+
+         
               </v-row>
            
               <v-col cols="12" class="text-center mt-3">
@@ -64,12 +123,6 @@
                 >
                   Search
                 </v-btn>
-                <v-btn 
-                class="ml-2" 
-                color="success" 
-                variant="flat" 
-                prepend-icon="mdi-plus" 
-                :to="`/user/saleorder/create`"></v-btn>
            
               </v-col>
           </v-card-text>
@@ -77,16 +130,7 @@
         <v-card-text>
           <v-row class="mb-2">
             <v-col cols="12" class="d-flex align-center flex-wrap">
-              <v-select
-                v-model="filter.length"
-                :items="[10, 20, 50, 100]"
-                density="compact"
-                variant="outlined"
-                max-width="120"
-                class="mr-3"
-                label="Per Page"
-                @change="loadItems"
-              />
+
               <div class="align-self-center">
                 Showing {{ filter.offset + 1 }} - {{ Math.min(filter.offset + items.length, total) }} of {{ total }} Records
               </div>
@@ -96,7 +140,8 @@
           </v-row>
 
 
-          <v-data-table-server
+          <v-data-table-server 
+            class="border striped-table"
             :headers="headers"
             :items="items"
             :items-length="total"
@@ -104,7 +149,8 @@
             v-model:page="filter.page"
             :items-per-page="filter.length"
             :items-per-page-options="[10, 20, 50, 100]"
-       
+            show-select
+            v-model:selected="selectedItems"   
             @update:options="loadItems"
           >
  
@@ -112,9 +158,9 @@
               <v-btn color="warning" variant="flat" :to="`/user/saleorder/edit/${item.id}`">
                 <v-icon>mdi-square-edit-outline</v-icon>
               </v-btn>
-              <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
+              <!-- <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
                 <v-icon>mdi-delete</v-icon>
-              </v-btn>
+              </v-btn> -->
             </template>
 
  
@@ -153,12 +199,13 @@
 import generaApi from "@/models/general.model"
 import UserDropdown from "@/components/UserDropdown.vue"
 export default {
+
   components: {
     UserDropdown
   },
   data() {
     return {
-      
+      selectedItems: [], 
       filter: {   search: "", 
         length: 10, 
         page: 1, 
@@ -172,6 +219,7 @@ export default {
       last_page: 1,
       loading: false,
       headers: [
+
         { title: "ID", value: "id" },
         { 
           title: "Date", 
@@ -181,7 +229,6 @@ export default {
         { title: "User", value: "user" },
         { title: "Delivery Note", value: "delivery_note" },
         { title: "Ref", value: "ref" },
-        { title: "Remarks", value: "remarks" },
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },
         { title: "Actions", value: "actions", sortable: false },
@@ -217,7 +264,7 @@ export default {
 
       const res = await generaApi.getAndfind(this.url, params);
 
-      this.items = res.data;         
+      this.items = res.data.map(item => ({ ...item }));       
       this.total = res.total;   
       this.last_page = res.last_page;
       this.filter.page = res.current_page;
@@ -230,26 +277,41 @@ export default {
       this.loading = false;
     }
   },
+    async deleteSelected() {
+      console.log(this.selectedItems)
+      if (!this.selectedItems.length) {
+        alert("No items selected!");
+        return;
+      }
 
-    async deleteItem(id) {
-        if (!confirm("Are you sure you want to delete this item?")) return;
+      if (!confirm("Are you sure you want to delete selected items?")) return;
 
-        this.loading = true;
-        try {
-        const deleteurl = this.url+id
-        const res = await generaApi.delete(deleteurl);
+      this.loading = true;
+      try {
+        const ids = this.selectedItems.map(item => item.id);
 
-        this.$alertStore.add(res.message || "Sale Invoice deleted", "success");
-        this.loadItems(); 
+        for (const id of ids) {
+          const deleteurl = this.url + id;
+          await generaApi.delete(deleteurl);
+        }
 
-        } catch (error) {
+        this.$alertStore.add("Selected items deleted successfully", "success");
+        this.selectedItems = []; 
+        this.loadItems();       
+
+      } catch (error) {
         console.error(error);
         this.$alertStore.add(error.message || "Delete failed", "error");
-        } finally {
+      } finally {
         this.loading = false;
-        }
-    }
+      }
+    },
+
+      reloadPage() {
+       this.loadItems();
+      }
 
   },
+  
 };
 </script>

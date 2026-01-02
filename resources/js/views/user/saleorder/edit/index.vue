@@ -135,7 +135,7 @@ export default {
           tax: Number(data.tax),
           user_id: data.user_id,
           items: (data.items || []).map(item => ({
-            product_id: item.product_id || "",
+            product: item.product || null,
             quantity: Number(item.quantity) || 1,
             price: Number(item.price) || 0,
             discount: Number(item.discount) || 0,
@@ -177,22 +177,22 @@ export default {
           discount: this.form.discount,
           tax: this.form.tax,
           user_id: this.form.user_id,
-          items: this.form.items.map(item => ({
-            product_id: item.product_id,
-            quantity: Number(item.quantity) || 1,
-            price: Number(item.price) || 0,
-            discount: Number(item.discount) || 0,
-            tax: Number(item.tax) || 0,
-          })),
+          items: this.form.items
+            .filter(item => item.product)
+            .map(item => ({
+              product_id: item.product.id,
+              quantity: Number(item.quantity) || 1,
+              price: Number(item.price) || 0,
+              discount: Number(item.discount) || 0,
+              tax: Number(item.tax) || 0,
+            })),
         };
 
         const response = await generaApi.put(updateUrl, payload);
 
-        // Show success popup
         const successMessage = response.data?.message || "Sale Order updated successfully!";
         this.$alertStore.add(successMessage, "success");
 
-        // Redirect after short delay
         setTimeout(() => {
           this.$router.push("/user/saleorder");
         }, 1000);
