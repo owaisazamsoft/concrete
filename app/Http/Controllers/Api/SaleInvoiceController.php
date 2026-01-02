@@ -93,7 +93,7 @@ class SaleInvoiceController extends Controller
             }
 
             // return view('saleInvoice',['data' => $data]);
-            $html = view('saleInvoice',['data' => $data])->render();
+            $html = view('saleInvoice.index',['data' => $data])->render();
             $mpdf = new Mpdf([
                 'mode' => 'utf-8',
                 'format' => 'A4',
@@ -101,6 +101,8 @@ class SaleInvoiceController extends Controller
             ]);
 
             $mpdf->WriteHTML($html);
+            $footer = view('saleInvoice.footer')->render();
+            $mpdf->SetHTMLFooter($footer);
 
             if(!$request->has('view')){
                   return $mpdf->Output($data->id.'-SaleInvoice.pdf', 'I');
