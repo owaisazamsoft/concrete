@@ -135,14 +135,15 @@ export default {
           tax: this.form.tax,
           user_id: this.form.user_id,
           items: this.form.items
-            .filter(item => item.product_id)
-            .map(item => ({
-              product_id: item.product_id,
-              quantity: Number(item.quantity) || 1,
-              price: Number(item.price) || 0,
-              discount: Number(item.discount) || 0,
-              tax: Number(item.tax) || 0,
-            })),
+          .filter(item => item.product)
+          .map(item => ({
+            product_id: item.product.id,
+                quantity: Number(item.quantity) || 1,
+                price: Number(item.price) || 0,
+                discount: Number(item.discount) || 0,
+                tax: Number(item.tax) || 0,
+          })),
+
         };
 
         const response = await generaApi.post(this.url, payload);
