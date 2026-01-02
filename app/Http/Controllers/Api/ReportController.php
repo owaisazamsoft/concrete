@@ -30,13 +30,13 @@ class ReportController extends Controller
             $data = $baseQuery->select([
                     'users.*',
 
-                 DB::raw("(SELECT SUM(total) FROM sale_invoices WHERE sale_invoices.user_id = users.id ) AS bills"),
+              
 
                  DB::raw("(SELECT SUM(credit) FROM payments WHERE payments.user_id = users.id ) AS payments_credit"),
 
                  DB::raw("(SELECT SUM(debit) FROM payments WHERE payments.user_id = users.id ) AS payments_debit"),
 
-                 DB::raw("(SELECT SUM(total) FROM delivery_notes WHERE delivery_notes.user_id = users.id ) AS dc")
+                 DB::raw("(SELECT SUM(total) FROM delivery_notes WHERE delivery_notes.user_id = users.id ) AS deliveryNote")
                    
                 ])
                 ->orderByDesc('id')
@@ -45,14 +45,15 @@ class ReportController extends Controller
                 ->get()
                 ->map(function($item){
 
+                  
                     $balance = 0;
-                    $balance =  $balance - $item->bills;
+                
                     $balance =  $balance + $item->payments_credit;
                     $balance =  $balance - $item->payments_debit;
-
-                    $balance =  $balance + $item->dc;
-
+                    $balance =  $balance - $item->deliveryNote;
                     $item->balance = $balance;
+
+
                     return $item;
 
             });
