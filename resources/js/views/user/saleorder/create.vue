@@ -147,9 +147,9 @@ async submitForm() {
       tax: this.form.tax,
       user_id: this.form.user_id,
       items: this.form.items
-        .filter(item => item.product_id)
+        .filter(item => item.product)
         .map(item => ({
-          product_id: item.product_id,
+          product_id: item.product.id,
           quantity: Number(item.quantity) || 1,
           price: Number(item.price) || 0,
           discount: Number(item.discount) || 0,
@@ -159,11 +159,11 @@ async submitForm() {
 
     const response = await generaApi.post(this.url, payload);
 
-    // Show success popup
+
     const successMessage = response.data?.message || "Sale Order created successfully!";
     this.$alertStore.add(successMessage, "success");
 
-    // Redirect after a short delay so user can see the message
+
     setTimeout(() => {
       this.$router.push("/user/saleorder");
     }, 1000);

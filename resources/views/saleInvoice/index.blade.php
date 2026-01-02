@@ -63,7 +63,36 @@
 
         <b>Amount In Words:</b> {{ ucwords(trim((new NumberFormatter('en', NumberFormatter::SPELLOUT))->format($data->total))) }} rupees
 
+    
+         <table width="100%" style="" class="" >
+                   <tr>
+                        <td colspan="3" 
+                         style="border:0" height="40px" ></td>
+                    </tr>
+                    <tr>
+                        <td  
+                            style="border:0;padding:5px;">
+                            Customer Signature :
+                        </td>
+                         <td width="20%"
+                            style="border:0;border-bottom:1px solid lightgray;" >
+                        </td>
+                        <td width="25%" style="border:none" ></td>
+                        <td 
+                          style="
+                            border:0; 
+                            padding:6px; 
+                            height:13px;">
+                            Prepared By :
+                        </td>
+                        <td width="20%"
+                          style="border:0;border-bottom:1px solid lightgray; ">
+                        
+                        </td>
+                    </tr>
 
+              
+                </table>
 
 
  

@@ -5,12 +5,17 @@
     class="mt-2 align-center"
     dense
   >
+
     <v-col cols="12" md="3">
       <productDropDown
-        v-model="item.product_id"
+        v-model="item.product"
         label="Product"
+        persistent-placeholder=""
+        @update:modelValue="item.price = $event?.price || 0"
       />
     </v-col>
+
+
     <v-col cols="6" md="2">
       <v-text-field
         v-model.number="item.quantity"
@@ -19,6 +24,7 @@
         density="compact"
       />
     </v-col>
+
     <v-col cols="6" md="3">
       <v-text-field
         v-model.number="item.price"
@@ -27,22 +33,9 @@
         density="compact"
       />
     </v-col>
-    <!-- <v-col cols="6" md="2">
-      <v-text-field
-        v-model.number="item.discount"
-        label="Discount"
-        type="number"
-        density="compact"
-      />
-    </v-col>
-    <v-col cols="6" md="2">
-      <v-text-field
-        v-model.number="item.tax"
-        label="Tax"
-        type="number"
-        density="compact"
-      />
-    </v-col> -->
+
+
+
     <v-col cols="6" md="3">
       <v-text-field
         :model-value="itemTotal(item)"
@@ -51,22 +44,15 @@
         disabled
       />
     </v-col>
+
+
     <v-col cols="6" md="1" class="text-center">
-      <v-btn
-        color="danger"
-
-        @click="$emit('remove', i)"
-      >X</v-btn>
+      <v-btn color="danger" @click="$emit('remove', i)">X</v-btn>
     </v-col>
-
   </v-row>
+
   <div class="mt-4 text-center">
-    <v-btn
-      color="primary"
-      variant="tonal"
-      icon="mdi-plus"
-      @click="$emit('add')"
-    />
+    <v-btn color="primary" variant="tonal" icon="mdi-plus" @click="$emit('add')" />
   </div>
 </template>
 
@@ -74,12 +60,8 @@
 import productDropDown from "@components/productDropdown.vue";
 
 defineProps({
-  items: {
-    type: Array,
-    required: true,
-  },
+  items: { type: Array, required: true }
 });
-
 defineEmits(["add", "remove"]);
 
 const itemTotal = (item) => {

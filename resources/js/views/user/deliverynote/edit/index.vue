@@ -56,7 +56,7 @@
       </v-card-text>
     </v-card>
 
-    <v-card class="mt-3" title="Invoice Total">
+    <v-card class="mt-3" title="Total">
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="3">
@@ -165,12 +165,14 @@ export default {
           discount: this.form.discount,
           tax: this.form.tax,
           user_id: this.form.user_id,
-          items: this.form.items.map(item => ({
-            product_id: item.product_id,
-            quantity: Number(item.quantity) || 1,
-            price: Number(item.price) || 0,
-            discount: Number(item.discount) || 0,
-            tax: Number(item.tax) || 0,
+          items: this.form.items
+          .filter(item => item.product)
+          .map(item => ({
+            product_id: item.product.id,
+                quantity: Number(item.quantity) || 1,
+                price: Number(item.price) || 0,
+                discount: Number(item.discount) || 0,
+                tax: Number(item.tax) || 0,
           })),
         };
 
