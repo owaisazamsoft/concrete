@@ -8,6 +8,12 @@
 </head>
 <body>
 
+
+<?php 
+
+?>
+
+
             @include('saleInvoice.header')
             <br>
             @include('saleInvoice.customerInfo')
@@ -22,11 +28,12 @@
                     <th class="center white">Price</th>
                     <th class="center white">Net Total</th>
                 </tr>
-  
     
-                @foreach($data->items as $i => $item)
+                @foreach($data->items->sortBy('id') as $i => $item)
 
                     @foreach($item->deliveryNote->items as $key => $dc)
+
+                    <?php //dd($item->deliveryNote->items); ?>
 
                         <tr>
                             @if($key == 0)
