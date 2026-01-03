@@ -25,31 +25,7 @@
                     Create
                   </v-list-item-title>
                 </v-list-item>
-
-                <v-list-item @click="reloadPage">
-                  <v-list-item-title class="d-flex align-center text-primary">
-                    <v-icon size="18" class="me-2" color="blue">mdi-reload</v-icon>
-                    Reload
-                  </v-list-item-title>
-                </v-list-item>
-
-                <v-list-item @click="printTable">
-                  <v-list-item-title class="d-flex align-center text-green">
-                    <v-icon size="18" class="me-2" color="green">mdi-printer</v-icon>
-                    Print
-                  </v-list-item-title>
-                </v-list-item>
-
-
-                <v-list-item @click="deleteSelected">
-                  <v-list-item-title class="d-flex align-center text-red">
-                    <v-icon size="18" class="me-2" color="red">mdi-delete</v-icon>
-                    Delete Selected
-                  </v-list-item-title>
-                </v-list-item>
-        
               </v-list>
-
           </v-menu>
         </v-card-title>
         <v-card class="" outlined>
@@ -150,8 +126,6 @@
             v-model:page="filter.page"
             :items-per-page="filter.length"
             :items-per-page-options="[10, 20, 50, 100]"
-            show-select
-            v-model:selected="selectedItems"  
             @update:options="loadItems"
           >
  
@@ -160,18 +134,14 @@
               <v-btn color="warning" variant="flat" :to="`/user/saleInvoice/edit/${item.id}`">
                 <v-icon>mdi-square-edit-outline</v-icon>
               </v-btn>
-<<<<<<< HEAD
 
                 <v-btn target="_blank" color="success" variant="flat" :to="`/api/saleInvoice/print/${item.id}`">
                 <v-icon>mdi-eye</v-icon>
               </v-btn>
 
               <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
-=======
-              <!-- <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
->>>>>>> b2f743c48cd75436c5f823ea21a55df4e8b861c7
                 <v-icon>mdi-delete</v-icon>
-              </v-btn> -->
+              </v-btn> 
             </template>
 
  
@@ -247,15 +217,10 @@ export default {
         { 
           title: "Date", 
           value: "date",
-          format: (value) => value ? value.split(' ')[0] : ''
+        
         },
         { title: "Invoice No", value: "prefix" },
         { title: "User", value: "user" },
-<<<<<<< HEAD
-=======
-        { title: "Delivery Note", value: "delivery_note" },
-        { title: "Ref", value: "ref" },
->>>>>>> b2f743c48cd75436c5f823ea21a55df4e8b861c7
         { title: "Paid Status", value: "is_paid" },
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },
@@ -306,34 +271,24 @@ export default {
     }
   },
 
-    async deleteSelected() {
-      console.log(this.selectedItems)
-      if (!this.selectedItems.length) {
-        alert("No items selected!");
-        return;
-      }
+  async deleteItem(id) {
 
       if (!confirm("Are you sure you want to delete selected items?")) return;
 
-      this.loading = true;
-      try {
-        const ids = this.selectedItems.map(item => item.id);
+        this.loading = true;
+        try {
+          
+            await generaApi.delete('/api/saleInvoice/'+id);
+            this.$alertStore.add("Selected items deleted successfully", "success");
+            this.loadItems();       
 
-        for (const id of ids) {
-          const deleteurl = this.url + id;
-          await generaApi.delete(deleteurl);
+        } catch (error) {
+          console.error(error);
+          this.$alertStore.add(error.message || "Delete failed", "error");
+        } finally {
+          this.loading = false;
         }
 
-        this.$alertStore.add("Selected items deleted successfully", "success");
-        this.selectedItems = []; 
-        this.loadItems();       
-
-      } catch (error) {
-        console.error(error);
-        this.$alertStore.add(error.message || "Delete failed", "error");
-      } finally {
-        this.loading = false;
-      }
     },
     reloadPage() {
        this.loadItems();

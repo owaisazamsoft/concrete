@@ -1,6 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12">
+      <!-- <DeliveryNotesList></DeliveryNotesList> -->
      <v-card>
         <v-card-title class="d-flex align-center justify-space-between">
       <div>
@@ -25,21 +26,6 @@
                 Create
               </v-list-item-title>
             </v-list-item>
-
-            <v-list-item @click="reloadPage">
-              <v-list-item-title class="d-flex align-center text-primary">
-                <v-icon size="18" class="me-2" color="blue">mdi-reload</v-icon>
-                Reload
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item @click="deleteSelected">
-              <v-list-item-title class="d-flex align-center text-red">
-                <v-icon size="18" class="me-2" color="red">mdi-delete</v-icon>
-                Delete Selected
-              </v-list-item-title>
-            </v-list-item>
-    
           </v-list>
 
       </v-menu>
@@ -142,8 +128,6 @@
             v-model:page="filter.page"
             :items-per-page="filter.length"
             :items-per-page-options="[10, 20, 50, 100]"
-            show-select
-            v-model:selected="selectedItems" 
             @update:options="loadItems"
           >
  
@@ -151,9 +135,9 @@
               <v-btn color="warning" variant="flat" :to="`/user/deliverynote/edit/${item.id}`">
                 <v-icon>mdi-square-edit-outline</v-icon>
               </v-btn>
-              <!-- <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
+              <v-btn color="danger" variant="flat" class="ml-1" @click="deleteItem(item.id)">
                 <v-icon>mdi-delete</v-icon>
-              </v-btn> -->
+              </v-btn>
             </template>
 
  
@@ -191,8 +175,10 @@
 <script>
 import generaApi from "@/models/general.model"
 import UserDropdown from "@/components/UserDropdown.vue"
+import DeliveryNotesList from "@/tables/DeliveryNotesList.vue";
 export default {
   components: {
+    DeliveryNotesList,
     UserDropdown
   },
   data() {
@@ -219,12 +205,7 @@ export default {
         },
         { title: "Invoice No", value: "prefix" },
         { title: "User", value: "user" },
-        { title: "Sale Invoice", value: "sale_invoice_item" },
         { title: "Ref", value: "ref" },
-<<<<<<< HEAD
-      
-=======
->>>>>>> b2f743c48cd75436c5f823ea21a55df4e8b861c7
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },
         { title: "Actions", value: "actions", sortable: false },
@@ -274,38 +255,30 @@ export default {
     }
   },
 
-    async deleteSelected() {
-      console.log(this.selectedItems)
-      if (!this.selectedItems.length) {
-        alert("No items selected!");
-        return;
-      }
-
+  async deleteItem(id) {
+   
       if (!confirm("Are you sure you want to delete selected items?")) return;
 
       this.loading = true;
       try {
-        const ids = this.selectedItems.map(item => item.id);
-
-        for (const id of ids) {
-          const deleteurl = this.url + id;
-          await generaApi.delete(deleteurl);
-        }
-
-        this.$alertStore.add("Selected items deleted successfully", "success");
-        this.selectedItems = []; 
-        this.loadItems();       
+        
+          await generaApi.delete('/api/deliveryNotes/'+id);
+          this.$alertStore.add("Selected items deleted successfully", "success");
+          this.loadItems();       
 
       } catch (error) {
-        console.error(error);
-        this.$alertStore.add(error.message || "Delete failed", "error");
+         console.error(error);
+          this.$alertStore.add(error.message || "Delete failed", "error");
       } finally {
-        this.loading = false;
+          this.loading = false;
       }
-    },
-    reloadPage() {
+
+  },
+  reloadPage() {
        this.loadItems();
   }
+
+
 
   },
 };

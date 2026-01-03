@@ -67,11 +67,11 @@ export default [
             label: "Sales Management",
             children:[
             
-                {
+                // {
               
-                    label: "Sale Order",
-                    path: "/user/saleorder",
-                },
+                //     label: "Sale Order",
+                //     path: "/user/saleorder",
+                // },
                 {
             
                     label: "Delivery Note",
