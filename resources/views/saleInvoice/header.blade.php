@@ -1,6 +1,6 @@
 <table class="no-border">
     <tr>
-        <td width="500px" class="top" style="vertical-align: top">
+        <td width="600px" class="top" style="vertical-align: top">
             <table width="100%" class="">
                 <tr>
                     <td style="width: 100px;" >
@@ -19,10 +19,11 @@
         </td>
         <td class="top right">
             <div style="font-size:13px" >Contact</div>
-            <div style="font-size:13px">M.tariq</div>
+            <!-- <div style="font-size:13px">M.tariq</div> -->
             <div style="font-size:13px">0333-3315283 </div>
-            <div style="font-size:13px"> 0301-2001477</div>
-            <div style="font-size:13px;padding-top: 5px;" >M.arif</div>
+            <div style="font-size:13px">0309-3315786 </div>
+            <!-- <div style="font-size:13px"> 0301-2001477</div> -->
+            <!-- <div style="font-size:13px;padding-top: 5px;" >M.arif</div> -->
             <div style="font-size:13px"> 0302-6841570</div>
         </td>
     </tr>

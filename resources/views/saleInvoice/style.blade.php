@@ -1,15 +1,21 @@
 <style>
-    
     body {
-   
         font-family: Arial, Helvetica, sans-serif; 
         font-size: 12px; 
+        color:black;
+        /* font-weight: bold; */
     }
     
-    h1 { font-size: 22px; margin: 0; }
-    table { width: 100%; border-collapse: collapse; }
+    h1 { 
+        font-size: 26px; 
+        margin: 0; 
+    }
+    table {
+        width: 100%; 
+        border-collapse: collapse; 
+    }
 
-    td, th { border: 1px solid lightgray; padding: 4px; color: inherit; }
+    td, th { border: 1px solid black; padding: 4px; color: inherit; }
     
     .no-border td { border: none; }
     
@@ -24,7 +30,7 @@
     .bold { font-weight: bold; }
     
     .gray { 
-        background: green;
+        background: black;
     }
 
     .white{
@@ -40,7 +46,7 @@
     }
 
     .subheading{  
-        background: #008000;
+        background: black;
         color: white;
         padding: 3px 5px;
         font-size: 13px;

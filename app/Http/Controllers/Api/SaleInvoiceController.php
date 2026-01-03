@@ -107,7 +107,7 @@ class SaleInvoiceController extends Controller
             if(!$request->has('view')){
                   return $mpdf->Output($data->id.'-SaleInvoice.pdf', 'I');
             }else{
-                  return view('saleInvoice',['data' => $data]);
+                  return view('saleInvoice.index',['data' => $data]);
             }
 
           
