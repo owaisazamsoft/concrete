@@ -2,32 +2,14 @@
   <v-row>
     <v-col cols="12">
       <v-card>
-
         <v-card-title class="d-flex align-center justify-space-between">
           <div>
             <div class="text-h6">{{title}}</div>
             <div class="text-caption text-grey">{{ subTitle }}</div>
           </div>
-          <v-menu location="bottom end">
-            <template #activator="{ props }">
-              <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props" />
-            </template>
-            <v-list>
-              <v-list-item v-for="(op) in actions.filter(r => r.isTop == 1)">
-                        <v-list-item-title 
-                          @click="handleRowAction(op,{})">
-                          <div>
-                              <v-icon 
-                                v-if="op.icon" 
-                                size="18" 
-                                class="me-2" 
-                                :color="op.color">{{ op.icon }}</v-icon>
-                              <span v-if="op.title">{{ op.title }}</span>
-                          </div>
-                        </v-list-item-title>
-                </v-list-item>
-            </v-list>
-          </v-menu>
+          <ToolBar 
+            :actions="actions.filter(r => r.isTop == 1)" 
+            @handleAction="handleRowAction($event)" />
         </v-card-title>
 
         <v-card class="" outlined>
@@ -37,29 +19,27 @@
                   v-for="field in fields"
                     :key="field.name"
                     cols="auto"
-                    
                   >
                   <UserDropdown v-if="field.name == 'user_id'" 
                     v-bind="field.props"
-                    v-model="field.value" 
-                  
+                    v-model="field.value"
+                    v-on="field?.events" 
                   />
 
-                  <v-btn v-else-if="field.component == 'v-btn'" 
-                         v-bind="field.props" >
+                  <v-btn v-else-if="field.component == 'v-btn'" v-bind="field.props" v-on="field.events"  >
                     {{ field.props.label }}
                   </v-btn>
-                  
+
                   <component v-else
                     :is="field.component"
                     v-model="field.value"
                     v-bind="field.props"
-                    
+                    v-on="field.events"
                   />
               </v-col>
               <v-col>
                 <div class="align-self-center">
-                  Showing {{ tableStore.offset + 1 }} - {{ Math.min(tableStore.offset + tableStore.length, tableStore.total ) }} of {{ tableStore.total}}
+                  Showing {{ tableStore.from }} - {{ tableStore.to }} of {{ tableStore.total}}
                   Records
                 </div>
               </v-col>
@@ -78,35 +58,14 @@
             :headers="headers" 
             :items="tableStore.data"   
             :items-length="tableStore.total"
-            :loading="tableStore.loading" 
-            v-model:page="tableStore.page" 
-            :items-per-page="tableStore.length"
-            :items-per-page-options="[config.Sorts]" 
+            :loading="tableStore.loading"
+            item-value="id" 
             @update:options="loadItems">
 
             <template #item.actions="{ item }">
-                <v-menu offset-y>
-                  <template v-slot:activator="{ props }">
-                    <v-btn icon v-bind="props">
-                      <v-icon>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list>
-                  <v-list-item v-for="(op) in actions.filter(r => !r?.isTop)">
-                        <v-list-item-title 
-                          @click="handleRowAction(op,item)">
-                          <div>
-                              <v-icon 
-                                v-if="op.icon" 
-                                size="18" 
-                                class="me-2" 
-                                :color="op.color">{{ op.icon }}</v-icon>
-                              <span v-if="op.title">{{ op.title }}</span>
-                          </div>
-                        </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
+                <ToolBar 
+                  :actions="actions.filter(r => !r?.isTop)" 
+                  @handleAction="handleRowAction($event,item)" />
             </template>
 
             <template #item.user="{ item }">
@@ -152,13 +111,14 @@
 import generaApi from "@/models/general.model"
 import UserDropdown from "@/components/UserDropdown.vue"
 import Config from "@/models/config.model";
-import { useTableStore } from "./TableStore";
-
+import { useTableStore } from "./components/TableStore";
+import ToolBar from "../components/ToolBar.vue";
 
 export default {
   name:"DeliveryNotesList",
   components: {
-    UserDropdown
+    UserDropdown,
+    ToolBar
   },
   data() {
     return {
@@ -176,6 +136,7 @@ export default {
             label: 'Start Date',
             clearable: true
           },
+          events:{}
         },
         {
           name: 'end_date',
@@ -186,6 +147,7 @@ export default {
             label: 'End Date',
             clearable: true
           },
+          events:{}
         },
         {
           name: 'user_id',
@@ -197,6 +159,7 @@ export default {
             minWidth:'200px',
             persistentPlaceholder:true,
           },
+          events:{}
         },
         {
           name: 'status',
@@ -209,6 +172,7 @@ export default {
             minWidth:'250px',
             persistentPlaceholder:true,
           },
+          events:{}
         },
         {
           name: 'search',
@@ -221,6 +185,7 @@ export default {
             minWidth:"300px",
             persistentPlaceholder:true,
           },
+          events:{}
         },
         {
           name: 'length',
@@ -231,52 +196,35 @@ export default {
             items:Config.Sorts,
             persistentPlaceholder:true,
           },
+          events:{}
         },
         {
-          name: 'sort',
+          name: 'button',
           value:'',
           component:'v-btn',
           props: {
-            title:'ssss',
             label: 'Search',
             color:'primary',
             persistentPlaceholder:true,
           },
+          events: {
+            click: () => this.loadItems()
+          }
         },
       ],
-      filter: {
-        search: "",
-        length: 10,
-        page: 1,
-        offset: 0,
-        start_date: "",
-        end_date: "",
-        user_id: null,
-        status: null
-      },
       actions:[
         {
           title:'Create',
           icon:'mdi-plus',
           color:'success',
           isTop:1,
+          link:'/user/deliveryNote/create'
         },
         {
           title:'Reload',
           icon:'mdi-reload',
           color:'danger',
           isTop:1,
-        },
-        {
-          title:'Download',
-          icon:'mdi-printer',
-          color:'success',
-          isTop:1,
-        },
-        {
-          title:'Print',
-          icon:'mdi-printer',
-          color:'success',
         },
         {
           title:'Edit',
@@ -291,78 +239,83 @@ export default {
       ],
       headers: [
         { title: "ID", value: "id" },
+        { title: "DC", value: "prefix" },
         { title: "Date", value: "date" },
-        { title: "Invoice No", value: "prefix" },
         { title: "User", value: "user" },
         { title: "Ref", value: "ref" },
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },
         { title: "Actions", value: "actions", sortable: false },
       ],
-      url: "/api/saleInvoice/",
+  
     };
   },
   mounted() {
-    // this.loadItems();
+
+    this.loadItems();
+
   },
   methods: {
 
     async loadItems() {
 
-        this.tableStore.loading = true;
+        this.loading = true;
         try {
-            const res = await generaApi.get("/api/deliveryNotes", this.filter);
+
+            const params = Object.fromEntries(this.fields.map(u => [u.name, u.value]));
+            params.page = this.tableStore.page;
+            const res = await generaApi.get('/api/deliveryNotes',params);
+
+            
             this.tableStore.data = res.data;
-            this.tableStore.total = Number(res.total);
-            this.tableStore.lastPage = Number(res.last_page);
+            this.tableStore.total = Number(res.total);                
             this.tableStore.page = Number(res.current_page);
-            this.tableStore.offset = res.from - 1 || 0;
+            this.tableStore.lastPage = Number(res.last_page);
+            this.tableStore.to = Number(res.to);
+            this.tableStore.from = Number(res.from);
+            this.tableStore.loading = false;  
+            this.tableStore.length = res.per_page
+
         } catch (error) {
+            this.$alertStore.add(error.message, "error");
             this.tableStore.data = [];
             this.tableStore.total = 0;
+            this.tableStore.page = 1;
             this.tableStore.lastPage = 1;
-        } finally {
-          this.tableStore.loading = false;
+            this.tableStore.loading = false;       
         }
-
     },
 
     async handleRowAction(action,item){
       switch (action.title) {
         case 'Create':
           this.$router.push('/user/deliverynote/Create')
+          break;
+        case 'Edit':
+          this.$router.push('/user/deliverynote/edit/'+item.id)
+          break;
         case 'Reload': 
           this.loadItems()
-        case 'Delete':
-            this.tableStore.DeleteRecord('/api/deliveryNotes/'+item.id).then(( re => {
-              this.loadItems();
-            }));
           break;
-      
+        case 'Delete':
+            this.tableStore.DeleteRecord('/api/deliveryNotes/'+item.id);
+          break;
         default:
           break;
+
       }
-    },
-    async deleteSelected(id) {
-        
-          if (!confirm("Are you sure you want to delete selected items?")) return;
-          this.loading = true;
 
-          try {
-              await generaApi.delete('/api/saleInvoice/'+id);
-              this.$alertStore.add("Selected items deleted successfully", "success");
-              this.loadItems();
-
-          } catch (error) {
-              console.error(error);
-              this.$alertStore.add(error.message || "Delete failed", "error");
-          } finally {
-              this.loading = false;
-          }
     },
-    reloadPage() {
-      this.loadItems();
-    }
+  
   },
 };
 </script>
+
+
+<style>
+
+  .toolbar-option{
+    cursor: pointer;
+  }
+
+</style>

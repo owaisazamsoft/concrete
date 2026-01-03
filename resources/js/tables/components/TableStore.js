@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import api from "../plugins/axios";
+import api from "../../plugins/axios";
 import generaApi from "@/models/general.model"
 
 import { errorHandler } from "@/services/responseHandleService";
@@ -7,20 +7,20 @@ import { errorHandler } from "@/services/responseHandleService";
 export const useTableStore = defineStore("table", {
     state: () => ({
         loading:false,
+        searchUrl:"",
         data:[],
         total:0,
         lastPage:1,
         page:1,
-        offset:1,
+        from:0,
+        to:0,
         length:10,
     }),
     getters: {
 
     },
     actions: {
-        toggleFilter() {
-            this.vehichleDetail.sidebar = !this.vehichleDetail.sidebar
-        },
+      
        async DeleteRecord(url) {
             
             if (!confirm("Are you sure you want to delete selected items?")) return ;
@@ -34,9 +34,16 @@ export const useTableStore = defineStore("table", {
                     // this.$alertStore.add(error.message || "Delete failed", "error");
                     return false;
                 } 
-
+                finally {
+                    return false;
+                }
         },
-        
-    },
+
+
+    
+
+    }
 
 });
+
+
