@@ -61,6 +61,12 @@ const vuetify = createVuetify({
             variant: 'outlined',
             density: 'compact',
         },
+         VAutocomplete: {
+            color:'primary',
+            baseColor:'inputColor',
+            variant: 'outlined',
+            density: 'compact',
+        },
     },
     theme: {
         defaultTheme: "adminLight",

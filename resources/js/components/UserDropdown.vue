@@ -1,5 +1,5 @@
 <template>
-  <v-select
+  <v-autocomplete
     v-bind="$attrs"
     :model-value="modelValue"
     :items="data"
