@@ -1,5 +1,5 @@
 <template>
-    <v-select
+    <v-autocomplete
         v-bind="$attrs"
         :model-value="modelValue"
         :items="data"
@@ -19,8 +19,7 @@ export default {
         modelValue: {
             type: [String, Number,Boolean],
             default: null
-        },
-       
+        }, 
     },
     data() {
         return {
@@ -33,7 +32,6 @@ export default {
         this.getData();
     },
     methods: {
-
         async getData() {
                 this.loading = true;
                 try {
