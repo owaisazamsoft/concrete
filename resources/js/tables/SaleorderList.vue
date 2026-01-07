@@ -114,10 +114,8 @@ import Config from "@/models/config.model";
 import { useTableStore } from "./components/TableStore";
 import ToolBar from "../components/ToolBar.vue";
 
-
-
 export default {
-  name:"DeliveryNotesList",
+  name:"SaleorderList",
   components: {
     UserDropdown,
     ToolBar
@@ -126,8 +124,8 @@ export default {
     return {
       tableStore:useTableStore(),
       config:Config,
-      title:'Sale Invoice',
-      subTitle:'View All Sale Invoice Details',
+      title:'Sale Order',
+      subTitle:'View All Sale Order Details',
       fields:[
         {
           name: 'start_date',
@@ -223,6 +221,7 @@ export default {
           icon:'mdi-plus',
           color:'success',
           isTop:1,
+          link:'/user/saleorder/create'
         },
         {
           title:'Reload',
@@ -231,12 +230,6 @@ export default {
           isTop:1,
         },
         {
-          title:'Download',
-          icon:'mdi-printer',
-          color:'success',
-          isTop:1,
-        },
-                {
           title:'Edit',
           icon:'mdi-printer',
           color:'warning',
@@ -245,23 +238,19 @@ export default {
           title:'Delete',
           icon:'mdi-delete',
           color:'danger',
-        },
-        {
-          title:'Print',
-          icon:'mdi-printer',
-          color:'success',
-        },
+        }
       ],
       headers: [
+
         { title: "ID", value: "id" },
         { 
           title: "Date", 
           value: "date",
-        
+          format: (value) => value ? value.split(' ')[0] : ''
         },
-        { title: "Invoice No", value: "prefix" },
         { title: "User", value: "user" },
-        { title: "Paid Status", value: "is_paid" },
+        { title: "Delivery Note", value: "delivery_note" },
+        { title: "Ref", value: "ref" },
         { title: "Status", value: "status" },
         { title: "Total", value: "total" },
         { title: "Actions", value: "actions", sortable: false },
@@ -272,7 +261,6 @@ export default {
   mounted() {
 
     this.loadItems();
-    
 
   },
   methods: {
@@ -284,7 +272,7 @@ export default {
 
             const params = Object.fromEntries(this.fields.map(u => [u.name, u.value]));
             params.page = this.tableStore.page;
-            const res = await generaApi.get('/api/saleInvoice',params);
+            const res = await generaApi.get('/api/saleOrder',params);
 
             
             this.tableStore.data = res.data;
@@ -306,33 +294,25 @@ export default {
         }
     },
 
-
-
     async handleRowAction(action,item){
       switch (action.title) {
         case 'Create':
-          this.$router.push('/user/saleInvoice/Create')
-          break;
-        case 'Print':
-          const pdfUrl = `${import.meta.env.VITE_API_BASE_URL}/api/saleInvoice/print/${item.id}`;
-          window.open(pdfUrl, '_blank');
+          this.$router.push('/user/saleorder/Create')
           break;
         case 'Edit':
-          this.$router.push('/user/saleInvoice/edit/'+item.id)
+          this.$router.push('/user/saleorder/edit/'+item.id)
           break;
         case 'Reload': 
           this.loadItems()
           break;
-        case 'Download':
-          this.tableStore.downloadAllExcel("/api/saleInvoice/",headers);
-          break;
         case 'Delete':
-          this.tableStore.DeleteRecord('/api/saleInvoice/'+item.id);   
+            this.tableStore.DeleteRecord('/api/saleorder/'+item.id);
           break;
-      
         default:
           break;
+
       }
+
     },
   
   },

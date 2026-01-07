@@ -78,6 +78,11 @@ export default [
                     path: "/user/deliverynote",
                 },
                 {
+            
+                    label: "Sale Order",
+                    path: "/user/saleorder",
+                },
+                {
                         label: "Sale Invoice",
                         path: "/user/saleInvoice",
                 },

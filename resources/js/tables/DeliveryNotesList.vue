@@ -157,6 +157,7 @@ export default {
             label: 'Users',
             clearable: true,
             minWidth:'200px',
+            maxWidth:'200px',
             persistentPlaceholder:true,
           },
           events:{}
@@ -170,6 +171,7 @@ export default {
             clearable: true,
             items:Config.Status,
             minWidth:'250px',
+            maxWidth:'200px',
             persistentPlaceholder:true,
           },
           events:{}
@@ -183,6 +185,7 @@ export default {
             label: 'Search',
             clearable: true,
             minWidth:"300px",
+            maxWidth:'200px',
             persistentPlaceholder:true,
           },
           events:{}
