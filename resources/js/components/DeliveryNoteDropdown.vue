@@ -1,11 +1,9 @@
 <template>
-  <v-select
+  <v-autocomplete
     v-bind="$attrs"
     :model-value="modelValue"
     :items="data"
-    item-title="title"
     :loading="loading"
-    return-object
     @update:model-value="handleValue"
   />
 </template>
@@ -16,10 +14,9 @@ import generaApi from "@/models/general.model"
 
 export default {
   name: "DeliveryNoteDropdown",
-
   props: {
     modelValue: {
-      type: Object,
+      type: [Number, String,Boolean],
       default: null
     },
     userId: {
@@ -47,6 +44,7 @@ export default {
 
   methods: {
     async getData() {
+      
       if (!this.userId) {
         this.data = []
         return
@@ -61,7 +59,7 @@ export default {
 
         this.data = res.data.map(item => ({
           id: item.id,
-          title: `${item.ref} - ${item.id}`,
+          title:item.ref +' - '+ item.prefix,
           total: Number(item.total || 0)
         }))
 
@@ -70,11 +68,12 @@ export default {
         this.data = []
       } finally {
         this.loading = false
+          this.$emit("update:loaded",true);
       }
     },
 
     handleValue(val) {
-      this.$emit("update:modelValue", val)
+      this.$emit("update:value", val)
     }
   }
 }

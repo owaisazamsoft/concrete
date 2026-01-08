@@ -19,8 +19,8 @@ class StoreSaleInvoiceRequest extends FormRequest
 
             'items' => 'required|array|min:1',
             'items.*.delivery_note_id'    => 'required|integer|exists:delivery_notes,id',
-            'items.*.discount' => 'required|numeric|min:0',
-            'items.*.tax' => 'required|numeric|min:0',
+            'items.*.discount' => 'nullable|numeric|min:0',
+            'items.*.tax' => 'nullable|numeric|min:0',
 
             'discount' => 'nullable|numeric',
             'tax' => 'nullable|numeric',

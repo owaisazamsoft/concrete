@@ -13,7 +13,13 @@
         <!-- Product -->
         <v-col cols="12" md="4">
           <label class="form-label">Product</label>
-          <ProductDropdown v-model="form.product_id" clearable placeholder="Select Product" />
+          <ProductDropdown 
+            item-title="title"
+            item-value="id"
+            :modelValue="form.product_id"  
+            @update:value="form.product_id = $event" 
+            clearable 
+            placeholder="Select Product" />
         </v-col>
 
         <!-- Qty -->
@@ -90,16 +96,16 @@ export default {
 
         const id = this.$route.params.id;
         const res = await generalModel.get('/api/stockadjustment/' + id, {});
-        this.date = res.date;
-        this.product_id = res.product_id;
-        this.qty = res.qty;
-        this.type = res.type;
-        this.price = res.price;
-        this.remarks = res.remarks;
+        this.form.date = res.data.date;
+        this.form.product_id = res.data.product_id;
+        this.form.qty = res.data.qty;
+        this.form.type = res.data.type;
+        this.form.price = res.data.price;
+        this.form.remarks = res.data.remarks;
       } catch (e) {
-        this.$alertStore.add("Failed to load data", "error");
+          this.$alertStore.add(e.message,"error");
       } finally {
-        this.loading = false;
+          this.loading = false;
       }
     },
 

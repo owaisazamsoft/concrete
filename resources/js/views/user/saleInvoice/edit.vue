@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <v-card :loading="loading" :disabled="loading"
-      title="Sale Invoice"
-      subtitle="Create Sale Invoice"
+      title="Edit Sale Invoice"
+      subtitle="Update Sale Invoice"
     >
       <v-card-text>
         <v-row class="pt-3">
@@ -35,7 +35,7 @@
                   persistent-placeholder=""/>
               </v-col>
               <v-col cols="12" sm="4">
-                <UserDropdown  v-model="form.user_id" label="User" />
+                <UserDropdown disabled v-model="form.user_id" label="User" />
               </v-col>
         </v-row>
       </v-card-text>
@@ -127,6 +127,7 @@ export default {
     return {
       Config,
       loading: false,
+      id: this.$route.params.id,
       form: {
         user_id: null,
         date: "",
@@ -142,10 +143,40 @@ export default {
     }
   },
   mounted() {
- 
+    this.loadInvoice();
     this.handleCalculation();
   },
+
   methods: {
+    async loadInvoice() {
+
+      this.loading = true
+    
+      try {
+
+          const res = await generalModel.get("/api/saleInvoice/"+this.id);
+          this.form.date = res.data.date?.substring(0, 10);
+          this.form.ref = res.data.ref;
+          this.form.is_paid = Number(res.data.is_paid);
+          this.form.remarks = res.data.remarks;
+          this.form.status = Number(res.data.status);
+          this.form.discount = Number(res.data.discount);
+          this.form.tax = Number(res.data.tax);
+          this.form.user_id = res.data.user_id;
+          this.form.items = res.data.items.map((it) => { 
+            return {
+              delivery_note_id:it.delivery_note_id,
+              total:it.total
+            }
+          });
+
+          this.loading = false;
+      } catch (e) {
+        this.$alertStore.add(e.message, "error")
+        this.loading = false;
+      }
+    },
+
     handleDeliveryNote(model,item){
       this.form.items[item.key].delivery_note_id = model.id;
       this.form.items[item.key].total = model.total;
@@ -178,10 +209,9 @@ export default {
     async submit() {
       this.loading = true
       try {
-          let res = await generalModel.post("/api/saleInvoice",this.form)
+          let res = await generalModel.put("/api/saleInvoice/"+this.id,this.form)
           this.$alertStore.add(res.message,"success");
           this.loading = false;
-           this.$router.push("/user/saleInvoice");
       } catch (e) {
           this.$alertStore.add(e.message, "error");
           this.loading = false;

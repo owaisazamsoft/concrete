@@ -303,7 +303,7 @@ export default {
     async handleRowAction(action,item){
       switch (action.title) {
         case 'Create':
-          this.$router.push('/user/saleInvoice/Create')
+          this.$router.push('/user/saleInvoice/create')
           break;
         case 'Print':
           const pdfUrl = `${import.meta.env.VITE_API_BASE_URL}/api/saleInvoice/print/${item.id}`;

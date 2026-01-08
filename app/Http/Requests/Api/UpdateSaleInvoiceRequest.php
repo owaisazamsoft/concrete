@@ -10,7 +10,7 @@ class UpdateSaleInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' =>['required','integer',Rule::exists('users','id')],
+            // 'user_id' =>['required','integer',Rule::exists('users','id')],
             'date' => 'required|date',
             'due_date' => 'nullable|date',
             'ref' => 'nullable|string|max:1000',
@@ -19,8 +19,8 @@ class UpdateSaleInvoiceRequest extends FormRequest
 
             'items' => 'required|array|min:1',
             'items.*.delivery_note_id'    => 'required|integer|exists:delivery_notes,id',
-            'items.*.discount' => 'required|numeric|min:0',
-            'items.*.tax' => 'required|numeric|min:0',
+            'items.*.discount' => 'nullable|numeric|min:0',
+            'items.*.tax' => 'nullable|numeric|min:0',
 
             'discount' => 'nullable|numeric',
             'tax' => 'nullable|numeric',

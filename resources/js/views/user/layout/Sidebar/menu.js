@@ -40,11 +40,11 @@ export default [
                     label: "Items",
                     path: "/user/inventory",
                 },
-                // {
-                //     label: "Stock Adjustment",
-                //     path:"/user/stockadjustment"
+                {
+                    label: "Stock Adjustment",
+                    path:"/user/stockadjustment"
                 
-                // },
+                },
             ]
         },
         // {

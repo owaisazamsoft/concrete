@@ -19,8 +19,11 @@
         <v-col cols="12" sm="4">
           <label class="form-label">Product</label>
           <ProductDropdown 
-            v-model="form.product_id"
-            clearable  
+            item-title="title"
+            item-value="id"
+            :modelValue="form.product_id"  
+            @update:value="form.product_id = $event" 
+            clearable 
             placeholder="Select Product" />
         </v-col>
         <v-col cols="12" md="4">
