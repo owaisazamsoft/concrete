@@ -1,14 +1,14 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <!-- Dashboard Cards -->
+    <!-- <v-row>
+    
       <v-col cols="12" sm="6" md="3" v-for="(value, key) in counter" :key="key">
         <dashboard-card :title="value.title" :count="value.count" />
       </v-col>
-    </v-row>
+    </v-row> -->
 
-    <!-- Graph Card -->
-    <v-row>
+
+    <!-- <v-row>
       <v-col cols="12" md="12">
         <v-card variant="elevated" elevation="5" color="background">
           <v-container>
@@ -17,7 +17,7 @@
           </v-container>
         </v-card>
       </v-col>
-    </v-row>
+    </v-row> -->
   </v-container>
 </template>
 
