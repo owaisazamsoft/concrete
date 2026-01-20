@@ -4,23 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Lot extends Model
 {
-
-
+    
     protected $table = 'posts';
     // protected $fillable = ['name'];
     protected $guarded = [];
 
-    protected $attributes = [
-        'type' => 'category',
+    protected $casts = [
+        'data' => 'json',
     ];
 
+    protected $attributes = [
+        'type' => 'lot',
+    ];
+    
     
      protected static function booted()
     {
         static::addGlobalScope('type', function ($builder) {
-            $builder->where('type', 'category');
+            $builder->where('type', 'lot');
         });
     }
 

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Department extends Model
 {
 
 
@@ -13,14 +13,14 @@ class Category extends Model
     protected $guarded = [];
 
     protected $attributes = [
-        'type' => 'category',
+        'type' => 'department',
     ];
 
     
      protected static function booted()
     {
         static::addGlobalScope('type', function ($builder) {
-            $builder->where('type', 'category');
+            $builder->where('type', 'department');
         });
     }
 

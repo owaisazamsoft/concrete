@@ -12,41 +12,19 @@ class User extends Authenticatable  // This should extend Authenticatable
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'companyName',
-        'companyAddress1',
-        'companyAddress2',
-        'townCity',
-        'country',
-        'postcode',
-        'telephone',
-        'businessType',
-        'companyReg',
-        'website',
-        'businessEmail',
-        'motorTradeInsurance',
-        'vatNumber',
-        'firstName',
-        'surname',
-        'title',
-        'jobTitle',
-        'phone',
-        'personalEmail',
+        'name',
+        'email',
         'password',
-        'email_verification_token_status',
-        'email_verification_token',
-        'resend_count',
-        'uploadID',
-        'motorTradeProof',
-        'addressProof',
-        'avatar',
-        'salesman',
-        'nic',
-        'ntn',
-        'group',
+        'data',
+
     ];
 
     protected $appends = [
-        'image_preview',
+        // 'image_preview',
+    ];
+
+    protected $casts = [
+        'data' => 'json',
     ];
 
 
@@ -56,19 +34,5 @@ class User extends Authenticatable  // This should extend Authenticatable
 
   
  
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'user_type', 'id');
-    }
-
-       protected function imagePreview(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->avatar ?  asset('/uploads/'.$this->avatar) : null
-        );
-    }
-
-
-
 
 }

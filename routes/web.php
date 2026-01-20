@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\DummyController;
 use App\Models\DeliveryNote;
 use App\Models\InvoiceSequence;
 use App\Models\SaleInvoice;
@@ -20,34 +21,10 @@ Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Broadcast::routes(['middleware' => ['auth']]);
 
 
-Route::get('/test', function () {
+
+Route::get('/data', [DummyController::class,'start']);
 
 
-    InvoiceSequence::where('type', 'delivery_note')->update([
-            'last_number' => 0
-    ]);
-    foreach (DeliveryNote::all() as $key => $value) {
-        $value->generatePrefix();
-    }
-
-
-    InvoiceSequence::where('type', 'sale_order')->update([
-            'last_number' => 0
-    ]);
-    foreach (SaleOrder::all() as $key => $value) {
-        $value->generatePrefix();
-    }
-
-     InvoiceSequence::where('type', 'sale_invoice')->update([
-            'last_number' => 0
-    ]);
-    foreach (SaleInvoice::all() as $key => $value) {
-        $value->generatePrefix();
-    }
-
-    
-    
-});
 
 
 Route::get('/{any?}', function () {

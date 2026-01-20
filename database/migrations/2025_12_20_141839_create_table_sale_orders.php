@@ -32,20 +32,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-
         Schema::create('sale_order_items', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('product_id')
-            ->nullable()
-            ->constrained('products')
-            ->restrictOnDelete();
-
-            $table->foreignId('sale_order_id')
-            ->nullable()
-            ->constrained('sale_orders')
-            ->cascadeOnDelete();
-
+            $table->integer('product_id')->nullable();
+            $table->integer('sale_order_id')->nullable();
             $table->string('price')->default(0)->nullable();
             $table->string('quantity')->default(0)->nullable();
             $table->string('discount')->default(0)->nullable();

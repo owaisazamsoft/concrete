@@ -89,14 +89,13 @@ import { useUserStore } from "@stores/userStore";
 import { useAlertStore } from "@stores/alertStore";
 import { useTheme } from "vuetify";
 import Logo from "@assets/images/logo/logo.png";
-import AuthHeader from "./AuthHeader.vue";
 import { toRaw } from "vue";
 
 
 export default {
     name: "Login",
     components: {
-        AuthHeader
+   
     },
     data() {
         return {
@@ -108,8 +107,8 @@ export default {
             errors: {},
             loading: false,
             form: {
-                email: "man411210@gmail.com",
-                password: "12345678",
+                email: "admin@gmail.com",
+                password: "admin123",
             },
         };
     },
@@ -122,7 +121,7 @@ export default {
         this.$themeStore.startLoading()
         this.userStore.getProfile().then(() => {
             this.$themeStore.endLoading()
-            this.$router.replace("/user/dashboard");
+            this.$router.replace("/admin/dashboard");
         }).catch(() => this.$themeStore.endLoading())
             
        
@@ -140,7 +139,7 @@ export default {
                 this.userStore.initializeUserSession(response.token,response.user);
                 themeStore.endLoading();
                 this.alertStore.add('Logged In Success', 'success');
-                this.$router.replace("/user/dashboard");
+                this.$router.replace("/admin/dashboard");
 
             } catch (error) {
                 themeStore.endLoading();

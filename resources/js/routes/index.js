@@ -10,6 +10,9 @@ import { useAlertStore } from '@stores/alertStore';
 import Layout from "@views/user/layout/index.vue";
 import NotFound from "@views/user/404.vue"
 import Login from '@/views/auth/login.vue';
+import Forget  from '@/views/auth/forget.vue';
+
+
 import Dashboard from '@views/user/dashboard/index.vue';
 import accountRoutes from "@views/user/account/route"
 import inventoryRoute from "@views/user/Inventory/route"
@@ -23,7 +26,7 @@ import paymentsRoute from "@/views/user/payments/route"
 import stockadjustmentRoute from "@views/user/stockadjustment/route"
 import saleorderRoute from "@views/user/saleorder/route"
 import deliverynoteRoute from "@views/user/deliverynote/route"
-import Forget  from '@/views/auth/forget.vue';
+
 
 
 
@@ -35,7 +38,7 @@ const routes = [
     { path: '/login', component: Login},
     { path: '/forgetpassowrd',name: 'forgot-password', component: Forget},
     {
-        path: "/user",
+        path: "/admin",
         component: Layout,
         children: [
             { path: 'dashboard', component: Dashboard, meta: { requiresAuth: true } },

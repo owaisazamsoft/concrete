@@ -10,8 +10,6 @@ import registerTags from "./tags";
 import "./style.css";
 
 
-
-
 const render = createApp(App);
 render.use(pinia);
 render.use(router);

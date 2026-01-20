@@ -19,17 +19,8 @@ return new class extends Migration
             $table->integer('debit')->nullable();
             $table->integer('credit')->nullable();
             $table->string('remarks')->nullable();
-
-
-            $table->foreignId('category_id')
-            ->nullable()
-            ->constrained('expense_category')
-            ->nullOnDelete();
-                    
-            $table->foreignId('user_id')
-            ->nullable()
-            ->constrained('users')
-            ->nullOnDelete();
+            $table->integer('category_id')->nullable();
+            $table->integer('user_id')->nullable();
 
             $table->timestamps();
             

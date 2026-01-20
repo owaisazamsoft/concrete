@@ -12,18 +12,13 @@ return new class extends Migration
     public function up(): void
     {
          Schema::create('payments', function (Blueprint $table) {
-
+            
             $table->id();
             $table->string('date')->nullable();
             $table->string('remarks')->nullable();
             $table->float('debit')->nullable();
             $table->float('credit')->nullable();
-            
-            $table->foreignId('user_id')
-            ->nullable()
-            ->constrained('users')
-            ->nullOnDelete();
-
+            $table->integer('user_id')->nullable();
             $table->timestamps();
             
         });

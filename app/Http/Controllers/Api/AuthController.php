@@ -49,23 +49,14 @@ class AuthController extends Controller
         }
 
         // Find the user with personalEmail and user_type = 0
-        $user = User::where('personalEmail', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
         if (!$user) {
             return response()->json(['message' => 'User not found or not authorized.',], 422);
         }
 
-        if ($user->email_verification_token_status == 0) {
-            return response()->json(['message' => 'This user verification not be done',], 422);
-        }
-
-        if ($user->status == 0) {
-            return response()->json(['message' => 'Your account is deactivated or blocked. Please contact support.',], 422);
-        }
-
-
         if (Hash::check($request->password, $user->password)) {
                 // Create token
-                $token = $user->createToken('autoboli_token')->plainTextToken;
+                $token = $user->createToken('skykidswear')->plainTextToken;
                 return response()->json([
                     'message' => 'Login Success',
                     'data' =>[

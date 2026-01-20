@@ -22,7 +22,7 @@ class UserController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = User::query()->where('user_type','!=',1);
+        $baseQuery = User::query();
         
         if($request->has('group') && $request->group != ''){
             $baseQuery->where('group',$request->group);
@@ -31,12 +31,8 @@ class UserController extends Controller
         if($request->has('search') && $request->search != ''){
             $search = $request->search;
             $baseQuery->where(function ($q) use ($search) {
-                $q->where('firstName', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%")
-                ->orWhere('salesman', 'like', "%{$search}%")
-                ->orWhere('phone', 'like', "%{$search}%")
-                ->orWhere('nic', 'like', "%{$search}%")
-                ->orWhere('townCity', 'like', "%{$search}%");
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('id', 'like', "%{$search}%");
             });
         }
 
@@ -45,7 +41,6 @@ class UserController extends Controller
             $data = $baseQuery->select([
                         '*'                       
                 ])
-                ->orderBy('firstName')
                 ->skip($offset)
                 ->take($length)
                 ->get();
@@ -61,13 +56,12 @@ class UserController extends Controller
 
 
 
-
        public function store(Request $request)
     {
         
         $user = new User();
         $validator = Validator::make($request->all(),[
-            'firstName' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             ],
         );
 
@@ -78,10 +72,16 @@ class UserController extends Controller
             ], 422);
         }
     
-        $user->firstName = $request->firstName;
-        $user->personalEmail = 'eamil'.rand(100, 999) .'@example.com';
-        $user->status = 1;
-        $user->user_type = 0;
+        $user->name = $request->name;
+        $user->password = '';
+        $user->email = 'email'.rand(100, 999) .'@example.com';
+
+        $data = $request->data ?? [];
+        // $data['phone'] = $request->phone;
+        // $data['group'] = $request->group;
+        // $data['role'] = $request->role;
+        $user->data = $data;
+
         $user->save();
    
         return response()->json([
@@ -89,26 +89,12 @@ class UserController extends Controller
             'data' => $user,
         ],200);
 
-    }
-
-
-        public function show(Request $request,$id)
-    {
-
-        $user = User::find($id);
-        if(!$user){
-            return response()->json(['message' => 'Record Not Found'],400);
-        }
-
-        $user->avatar = asset('/uploads/'.$user->avatar);
-        return response()->json([
-            'message' => 'Get Profile Details',
-            'data' => [
-                'user' => $user
-            ],
-        ]);
 
     }
+
+  
+
+
 
       public function update(Request $request,$id)
     {
@@ -120,16 +106,7 @@ class UserController extends Controller
         }
 
         $validator = Validator::make($request->all(),[
-            'firstName' => 'required|string|max:255',
-            'personalEmail' => ['required','string','email','max:255',Rule::unique('users', 'personalEmail')->ignore($id)],
-            'phone' => 'nullable|string|max:255',
-            'country' => 'nullable|string|max:255',
-            'townCity' => 'nullable|string|max:255',
-            'companyAddress1' => 'nullable|string|max:255',
-            'salesman' => 'nullable|string|max:255',
-            'nic'  => 'nullable|string|max:255',
-            'ntn'  => 'nullable|string|max:255',
-            'group' => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
             ],
         );
 
@@ -140,31 +117,21 @@ class UserController extends Controller
             ], 422);
         }
 
-        $user->companyAddress1 = $request->companyAddress1;
-        $user->firstName = $request->firstName;
-        $user->phone = $request->phone;
-        $user->personalEmail = $request->personalEmail;
-        $user->townCity = $request->townCity;
-        $user->country = $request->country;
+        $user->name = $request->name;
+        $user->data = $request->data ?? [];
 
-        $user->salesman = $request->salesman;
-        $user->nic = $request->nic;
-        $user->ntn = $request->ntn;
-        $user->group = $request->group;
-
-
-        if ($request->file('avatar')) {
+        // if ($request->file('image')) {
             
-            // Remove existing thumbnail if it exists
-            if ($user->avatar && file_exists(public_path('uploads/' . $user->avatar))) {
-                unlink(public_path('uploads/' . $user->avatar));
-            }
+        //     // Remove existing thumbnail if it exists
+        //     if ($user->image && file_exists(public_path('uploads/' . $user->image))) {
+        //         unlink(public_path('uploads/' . $user->image));
+        //     }
 
-            $fileName = time() . '__ff__' . $request->file('avatar')->getClientOriginalName();
-            $filePath = public_path('uploads/');
-            $request->file('avatar')->move($filePath, $fileName);
-            $user->avatar = $fileName;
-        }
+        //     $fileName = time() . '__ff__' . $request->file('image')->getClientOriginalName();
+        //     $filePath = public_path('uploads/');
+        //     $request->file('image')->move($filePath, $fileName);
+        //     $user->image = $fileName;
+        // }
 
         $user->save();
    
@@ -185,13 +152,13 @@ class UserController extends Controller
             return response()->json(['message' => 'Record Not Found'],400);
         }
 
-        if(Payment::where('user_id',$id)->first()){
-            return response()->json(['message' => 'Cannot Delete Record it Used In Payments'],400);
-        }
+        // if(Payment::where('user_id',$id)->first()){
+        //     return response()->json(['message' => 'Cannot Delete Record it Used In Payments'],400);
+        // }
 
-        if(SaleInvoice::where('user_id',$id)->first()){
-            return response()->json(['message' => 'Cannot Delete Record it Used In Invoice'],400);
-        }
+        // if(SaleInvoice::where('user_id',$id)->first()){
+        //     return response()->json(['message' => 'Cannot Delete Record it Used In Invoice'],400);
+        // }
         
         $user->delete();
 
@@ -202,7 +169,6 @@ class UserController extends Controller
     }
 
 
-  
 
 
 }

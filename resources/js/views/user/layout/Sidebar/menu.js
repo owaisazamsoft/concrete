@@ -3,7 +3,7 @@ export default [
         {
             icon: "mdi-view-dashboard-outline",
             label: "Dashboard",
-            path: "/user/dashboard",
+            path: "/admin/dashboard",
         },
         {
             icon: "mdi-account-multiple",
@@ -12,13 +12,8 @@ export default [
             children:[
                 {
               
-                    label: "Account List",
-                    path: "/user/account",
-                },
-                {
-            
-                    label: "Receive / Payable",
-                    path: "/user/payments",
+                    label: "Employees",
+                    path: "/admin/account",
                 },
 
             ]
