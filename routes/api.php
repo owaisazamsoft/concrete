@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\DeliveryNoteController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SaleInvoiceController;
 use App\Http\Controllers\Api\UnitController;
@@ -35,6 +36,7 @@ Route::prefix('auth')->group(function () {
 
 
 Route::apiResource('users', UserController::class);
+Route::apiResource('posts', PostController::class);
 Route::apiResource('products', ProductController::class);
 Route::apiResource('category', CategoryController::class);
 Route::apiResource('unit', UnitController::class);

@@ -1,9 +1,5 @@
 <template>
-    <v-card 
-        :loading="loading" 
-        :disabled="loading" 
-        title="Account Information" 
-        subtitle="Create New Employe Account Information Carefully">
+    <v-card :loading="loading" :disabled="loading" class="" title="Account Information" subtitle="Update User Account Information Carefully">
         <div class="border-b"></div>
         <v-card-text>
             <v-container fluid>
@@ -69,6 +65,8 @@
 import DepartmentDropdown from '@/components/DepartmentDropdown.vue';
 import GroupDropdown from '@/components/GroupDropdown.vue';
 import generalModel from '@/models/general.model';
+import UserModel from '@/models/user.model';
+import helper from '@/plugins/hleper';
 import { toRaw } from 'vue';
 
 
@@ -80,7 +78,8 @@ export default {
     },
     data() {
         return {
-            loading: false,
+            loading: true,
+            helper: helper,
             form: {
                 id:'',
                 name:'',
@@ -92,7 +91,7 @@ export default {
                 group_id:null,
                 address:'',
             },
-        
+            edit: false,
         };
     },
     computed: {
@@ -101,16 +100,42 @@ export default {
     },
   async mounted() {
         
+   
 
+        this.loadDataFromProfile()
     },
     methods: {
+
+        async loadDataFromProfile() {
+            this.loading = true;
+            try {
+
+                let response = await generalModel.get('/api/users/'+this.$route.params.id,{});
+                this.form.name = response.data.name;
+                this.form.gender = response.data.data?.gender;
+                this.form.phone = response.data.data?.phone;
+                this.form.nic = response.data.data?.nic;
+                this.form.dob = response.data.data?.dob;
+                this.form.address = response.data.data?.address;
+                this.form.department_id = Number(response.data.data?.department_id);
+                this.form.group_id = Number(response.data.data?.group_id);
+               
+          
+          
+                this.loading = false;
+            } catch (error) {
+                this.$alertStore.add(error.message, 'error');
+                this.loading = false;
+            }
+        },
         async submit() {
             this.loading = true;
             try {
-                const response = await generalModel.post('/api/users',this.form);
+
+                const response = await generalModel.put('/api/users/'+this.$route.params.id,this.form);
                 this.$alertStore.add('Profile Updated', 'success');
                 this.loading = false;
-              
+                this.loadDataFromProfile()
             } catch (error) {      
                 this.$alertStore.add(error.message, 'error');
                 this.loading = false;

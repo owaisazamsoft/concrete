@@ -32,6 +32,11 @@ class User extends Authenticatable  // This should extend Authenticatable
         'password',
     ];
 
+
+    public function groups() {
+        return $this->belongsToMany(Group::class,'user_groups','user_id','group_id');
+    }
+
   
  
 

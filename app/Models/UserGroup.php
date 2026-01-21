@@ -2,18 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class UserGroup extends Model
 {
 
     // protected $fillable = ['name'];
     protected $guarded = [];
 
-    protected $casts = [
-        'data' => 'json',
-    ];
-
-
-    
 }

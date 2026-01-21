@@ -22,11 +22,9 @@ class UserController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = User::query();
+        $baseQuery = User::where('name','!=','admin');
         
-        if($request->has('group') && $request->group != ''){
-            $baseQuery->where('group',$request->group);
-        }
+     
 
         if($request->has('search') && $request->search != ''){
             $search = $request->search;
@@ -76,11 +74,16 @@ class UserController extends Controller
         $user->password = '';
         $user->email = 'email'.rand(100, 999) .'@example.com';
 
-        $data = $request->data ?? [];
-        // $data['phone'] = $request->phone;
-        // $data['group'] = $request->group;
-        // $data['role'] = $request->role;
-        $user->data = $data;
+       
+        $data = [];
+        $data['phone'] = $request->phone;
+        $data['group_id'] = $request->group_id;
+        $data['department_id'] = $request->department_id;
+        $data['nic'] = $request->nic;
+        $data['gender'] = $request->gender;
+        $data['dob'] = $request->dob;
+        $data['address'] = $request->address;
+        $user->data =  $data;
 
         $user->save();
    
@@ -94,6 +97,20 @@ class UserController extends Controller
 
   
 
+        public function show(Request $request,$id)
+    {
+        
+        $user = User::find($id);
+        if(!$user){
+            return response()->json(['message' => 'Record Not Found'],400);
+        }
+
+        return response()->json([
+            'message' => '',
+            'data' => $user,
+        ]);
+
+    }
 
 
       public function update(Request $request,$id)
@@ -118,23 +135,18 @@ class UserController extends Controller
         }
 
         $user->name = $request->name;
-        $user->data = $request->data ?? [];
-
-        // if ($request->file('image')) {
-            
-        //     // Remove existing thumbnail if it exists
-        //     if ($user->image && file_exists(public_path('uploads/' . $user->image))) {
-        //         unlink(public_path('uploads/' . $user->image));
-        //     }
-
-        //     $fileName = time() . '__ff__' . $request->file('image')->getClientOriginalName();
-        //     $filePath = public_path('uploads/');
-        //     $request->file('image')->move($filePath, $fileName);
-        //     $user->image = $fileName;
-        // }
+        $data = [];
+        $data['phone'] = $request->phone;
+        $data['group_id'] = $request->group_id;
+        $data['department_id'] = $request->department_id;
+        $data['nic'] = $request->nic;
+        $data['gender'] = $request->gender;
+        $data['dob'] = $request->dob;
+        $data['address'] = $request->address;
+        $user->data =  $data;
 
         $user->save();
-   
+
         return response()->json([
             'message' => "Record Updated Successfuly",
             'data' => $user,
@@ -152,14 +164,6 @@ class UserController extends Controller
             return response()->json(['message' => 'Record Not Found'],400);
         }
 
-        // if(Payment::where('user_id',$id)->first()){
-        //     return response()->json(['message' => 'Cannot Delete Record it Used In Payments'],400);
-        // }
-
-        // if(SaleInvoice::where('user_id',$id)->first()){
-        //     return response()->json(['message' => 'Cannot Delete Record it Used In Invoice'],400);
-        // }
-        
         $user->delete();
 
         return response()->json([
@@ -168,9 +172,4 @@ class UserController extends Controller
 
     }
 
-
-
-
 }
-
-

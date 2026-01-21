@@ -42,26 +42,23 @@
                                     </div>
                                     <div class="pl-2 py-2">
                                         <v-btn class="text-center" color="success" variant="flat"
-                                            prepend-icon="mdi-plus" to="/user/account/create" />
+                                            prepend-icon="mdi-plus" to="/admin/account/create" />
                                     </div>
                                 </div>
 
-                                <v-data-table-server class="border striped-table" :headers="headers" :items="items"
-                                    :items-length="totalItems" :loading="loading" item-value="id"
+                                <v-data-table-server class="border striped-table" 
+                                    :headers="headers" 
+                                    :items="items"
+                                    :items-length="totalItems" 
+                                    :loading="loading" 
+                                    item-value="id"
                                     @update:options="loadItems">
 
-                                    <template #item.img="{ item }">
-                                    <v-img :src="item.image_preview" width="60" height="50" contain></v-img>
-                                    </template>
-
-                                    <template #item.view="{ item }">
-                                        <v-btn color="warning" variant="flat" :to="`/user/account/edit/${item.id}`">
-                                            <v-icon>mdi-square-edit-outline</v-icon>
-                                        </v-btn>
-                                        <span class="px-1 py-1"> </span>
-                                        <v-btn color="danger" variant="flat" >
-                                            <v-icon>mdi-delete</v-icon>
-                                        </v-btn>
+                                    <template #item.action="{ item }">
+                                        <ToolBarOption>
+                                            <v-list-item title="Edit" :to="'/admin/account/edit/'+item.id" />
+                                            <v-list-item title="Delete" @click="remove(item.id)" />
+                                        </ToolBarOption>
                                     </template>
                                     <template v-slot:bottom>
                                         <div class="py-2">
@@ -70,7 +67,6 @@
                                         </div>
                                     </template>
                                 </v-data-table-server>
-
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -82,6 +78,8 @@
 
 <script>
 
+import ToolBarOption from "@/components/ToolBarOption.vue";
+import generalModel from "@/models/general.model";
 import UserModel from "@/models/user.model";
 
 
@@ -90,7 +88,7 @@ import UserModel from "@/models/user.model";
 
 export default {
     components: {
-
+        ToolBarOption
     },
     data() {
         return {
@@ -108,23 +106,24 @@ export default {
             loading: false,
             headers: [
                 { title: "ID", value: "id",sortable: false },
-                { title: "Image", key: "img" },
-                { title: "Account", value: "firstName" },
-                { title: "Group", value: "group" },
-                { title: "Phone", value: "phone" },
-                { title: "NIC", value: "nic" },
-                { title: "Salesman", value: "salesman" },
-                { title: "City", value: "townCity" },
-                { title: "Action", key: 'view', sortable: false },
+                { title: "Name", value: "name" },
+                { title: "Gender", value: "data.gender" },
+                { title: "Phone", value: "data.phone" },
+                { title: "Group", value: "data.group" },
+                { title: "Department", value: "data.department" },
+                { title: "NIC", value: "data.nic" },
+                { title: "Action", key: 'action', sortable: false },
             ],
         };
     },
     computed: {
        
     },
-    mounted() {
+    async mounted() {
 
-        this.loadItems();
+ 
+        
+        // this.loadItems();
     },
     methods: {
 
@@ -151,6 +150,9 @@ export default {
             }
 
         },
+        async remove(){
+
+        }
 
     },
 };

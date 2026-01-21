@@ -7,6 +7,7 @@ use App\Http\Resources\UserProfileResource;
 use App\Models\Category;
 use App\Models\Department;
 use App\Models\ExpenseCategory;
+use App\Models\GeneralRelation;
 use App\Models\Group;
 use App\Models\Lot;
 use App\Models\Post;
@@ -14,6 +15,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 
 use App\Models\User;
+use App\Models\UserGroup;
 use Carbon\Carbon;
 use Illuminate\Container\Attributes\DB;
 use Illuminate\Support\Facades\Validator;
@@ -31,38 +33,34 @@ class DummyController extends Controller
     }
     
        public function start(Request $request)
-    {  
-
-        if(Group::count() == 0){
+    {   
+            Post::query()->delete();
+            
             Group::create(['title' => 'Staff']);
             Group::create(['title' => 'Operator']);
             Group::create(['title' => 'Laiber']);
-        }
+        
 
-        if(Department::count() == 0){
+    
             Department::create(['title' => 'Zubair']);
             Department::create(['title' => 'Imtiyaz']);
             Department::create(['title' => 'Shafat']);
-        }
+        
 
-        if(User::count() < 2){
             $this->user(100);
-        }
+        
 
-        if(Category::count() == 0){
+      
             $cat = ['Shirts','T-Shirts','Jeans','Dresses','Jackets','Sweaters','Activewear','Underwear','Shoes','Accessories'];
             foreach ($cat as $value) {
                 Category::create(['title' => $value]);
             }
-        }
+        
 
-        if(Product::count() == 0){
+  
             $this->product(100);
-        }
-
-        if(Lot::count() == 0){
             $this->lot(100);
-        }
+        
 
     }
 
@@ -70,26 +68,31 @@ class DummyController extends Controller
         public function user($count)
     {  
 
+        User::where('name','!=','admin')->delete();
+
         $groups = Group::pluck('id')->toArray();
         $derpartments = Department::pluck('id')->toArray();
 
         foreach (range(1, $count) as $key => $value) {
-
             $gender = $this->faker->randomElement(['male', 'female']);
-            User::create([
+            $user = User::create([
                 'name' => $this->faker->name($gender),
                 'email' => $this->faker->unique()->safeEmail(),
                 'password' => '',
+                'department_id' => $this->faker->randomElement($derpartments),
                 'data' => [
                     'dob' => $this->faker->date('Y-m-d'),
+                    'phone' => $this->faker->numerify('03##-#######'),
                     'gender' => $gender,
-                    'address' => $this->faker->address(),
-                    'group' => $this->faker->randomElement($groups),
-                    'department_id' => $this->faker->randomElement($derpartments),
+                    'nic' => $this->faker->numerify('#####-#######-#'),
+                    'address' => $this->faker->address(),    
                 ],
             ]);
 
+            UserGroup::create(['user_id' => $user->id, 'group_id' => $this->faker->randomElement($derpartments)]);
         }
+
+    
 
     }
 
