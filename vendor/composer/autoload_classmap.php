@@ -51,6 +51,7 @@ return array(
     'App\\Models\\DeliveryNoteItem' => $baseDir . '/app/Models/DeliveryNoteItem.php',
     'App\\Models\\Expense' => $baseDir . '/app/Models/Expense.php',
     'App\\Models\\ExpenseCategory' => $baseDir . '/app/Models/ExpenseCategory.php',
+    'App\\Models\\InvoiceSequence' => $baseDir . '/app/Models/InvoiceSequence.php',
     'App\\Models\\Payment' => $baseDir . '/app/Models/Payment.php',
     'App\\Models\\Product' => $baseDir . '/app/Models/Product.php',
     'App\\Models\\Role' => $baseDir . '/app/Models/Role.php',
