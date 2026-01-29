@@ -16,7 +16,8 @@
 </template>
 
 <script>
-import UserModel from '@/models/user.model';
+import generalModel from '@/models/general.model';
+
 
 export default {
     data() {
@@ -34,13 +35,10 @@ export default {
         try {
                 
             this.loading = true;
-            let res = await UserModel.create(this.form);
+            let res = await generalModel.post('/api/users',this.form);
             this.loading = false;
             this.$alertStore.add(res.message,'success');
             this.$router.push('/user/account/edit/' + res.data.id);
-
-
-
 
         } catch (error) {
              this.loading = false;
@@ -48,10 +46,7 @@ export default {
         }
     
     },
-    handle(value){
-        
-        // this.open = value;        
-    }
+   
 
   },
 };

@@ -5,25 +5,11 @@
         color:black;
         /* font-weight: bold; */
     }
-
+    
     h1 { 
-        font-size: 38px; 
+        font-size: 26px; 
         margin: 0; 
     }
-
-    .label{
-        font-size: 15px;
-    }
-
-    .text{
-        font-size: 15px;
-        font-weight: bold;
-    }
-
-
-    
-   
-
     table {
         width: 100%; 
         border-collapse: collapse; 

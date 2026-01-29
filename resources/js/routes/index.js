@@ -23,7 +23,7 @@ import paymentsRoute from "@/views/user/payments/route"
 import stockadjustmentRoute from "@views/user/stockadjustment/route"
 import saleorderRoute from "@views/user/saleorder/route"
 import deliverynoteRoute from "@views/user/deliverynote/route"
-import Forget  from '@/views/auth/forget.vue';
+
 
 
 
@@ -32,8 +32,7 @@ const suburl = import.meta.env.VITE_SUB_URL;
 const routes = [
 
     { path: '/', component: Login},
-    { path: '/login', component: Login},
-    { path: '/forgetpassowrd',name: 'forgot-password', component: Forget},
+    { path: '/login', component: Login},  
     {
         path: "/user",
         component: Layout,
@@ -66,18 +65,17 @@ const router = createRouter({
 });
 
 
-
 router.beforeEach(async (to, from, next) => {
-
 
     const auth = useUserStore()
     const alertStore = useAlertStore()
 
     //Auth Restriction
-
         try {
 
             const res = await auth.getProfile();
+            console.log(res);
+            
             auth.user = res.user;
             auth.is_logged_in = true;
             
@@ -98,7 +96,6 @@ router.beforeEach(async (to, from, next) => {
     } else {
         next()
     }
-
 
 
 });

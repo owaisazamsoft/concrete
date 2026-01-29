@@ -7,7 +7,7 @@
             style="
             border-color:lightgray;
             margin-top:3px;
-            font-size:13px;
+            font-size:11px;
             text-align:center;
             border:0px;
             border-top:1px solid"

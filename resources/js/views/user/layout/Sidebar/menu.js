@@ -1,5 +1,4 @@
 export default [
-       
         {
             icon: "mdi-view-dashboard-outline",
             label: "Dashboard",

@@ -3,7 +3,7 @@
     v-bind="$attrs"
     :model-value="modelValue"
     :items="data"
-    item-title="firstName"
+    item-title="nameWithAddress"
     item-value="id"
     :loading="loading"
     clearable

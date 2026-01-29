@@ -34,6 +34,7 @@ class UserController extends Controller
                 $q->where('firstName', 'like', "%{$search}%")
                 ->orWhere('id', 'like', "%{$search}%")
                 ->orWhere('salesman', 'like', "%{$search}%")
+                ->orWhere('group', 'like', "%{$search}%")
                 ->orWhere('phone', 'like', "%{$search}%")
                 ->orWhere('nic', 'like', "%{$search}%")
                 ->orWhere('townCity', 'like', "%{$search}%");
@@ -48,7 +49,11 @@ class UserController extends Controller
                 ->orderBy('firstName')
                 ->skip($offset)
                 ->take($length)
-                ->get();
+                ->get()
+                ->map(function($item){
+                    $item->nameWithAddress = $item->firstName.' ('.$item->companyAddress1.')';
+                    return $item;
+                });
 
             return response()->json([
                 'total' => $count,

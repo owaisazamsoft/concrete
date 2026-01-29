@@ -4,6 +4,13 @@ import { errorHandler } from "@/services/responseHandleService";
 
 export default class     {
 
+    
+    static sort = [
+        50, 
+        100, 
+        500,
+        1000,
+    ];
 
     static async get(url:string,options:any) {
         

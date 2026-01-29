@@ -1,13 +1,8 @@
 <template>
-    <!-- <user-title-bar title="Watched & Alerted" subtitle="Track recently watched and alerted vehicles — stay ahead of every auction opportunity">
-        <div class="d-flex align-center ga-3"></div>
-    </user-title-bar> -->
-
         <v-row>
             <v-col cols="12">
                 <v-row class="mt-3">
-                    <v-col cols="12" class="">
-                        
+                    <v-col cols="12" class="">                        
                         <v-card title="Accounts" subtitle="View All Accounts List" class="">
                             <v-card-text>
                                 <div class="pb-3 pt-3 d-flex flex-wrap ">
@@ -15,8 +10,7 @@
                                         <v-select 
                                             label="Length" 
                                             v-model="filter.length" 
-                                            :items="[50, 100, 500]"  
-                                            class=""
+                                            :items="generalStore.sort"  
                                             width="150"
                                              />
                                     </div>
@@ -47,7 +41,9 @@
                                 </div>
 
                                 <v-data-table-server class="border striped-table" :headers="headers" :items="items"
-                                    :items-length="totalItems" :loading="loading" item-value="id"
+                                    :items-length="totalItems" 
+                                    :loading="loading" 
+                                    item-value="id"
                                     @update:options="loadItems">
 
                                     <template #item.img="{ item }">
@@ -59,9 +55,9 @@
                                             <v-icon>mdi-square-edit-outline</v-icon>
                                         </v-btn>
                                         <span class="px-1 py-1"> </span>
-                                        <v-btn color="danger" variant="flat" >
+                                        <!-- <v-btn color="danger" variant="flat" >
                                             <v-icon>mdi-delete</v-icon>
-                                        </v-btn>
+                                        </v-btn> -->
                                     </template>
                                     <template v-slot:bottom>
                                         <div class="py-2">
@@ -70,7 +66,6 @@
                                         </div>
                                     </template>
                                 </v-data-table-server>
-
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -82,11 +77,9 @@
 
 <script>
 
-import UserModel from "@/models/user.model";
+import generalModel from "@/models/general.model";
+import { useGeneralStore } from "@/stores/generalStore";
 
-
-
-// console.log(accounts);
 
 export default {
     components: {
@@ -94,27 +87,27 @@ export default {
     },
     data() {
         return {
-            createModel: false,
             filter: {
                 search: '',
-                length: 10,
+                length: 50,
                 page: 1,
                 offset: 0,
                 group:null,
             },
+            generalStore:useGeneralStore(),
             last_page: 1,
             items: [],
             totalItems: 0,
             loading: false,
             headers: [
                 { title: "ID", value: "id",sortable: false },
-                { title: "Image", key: "img" },
-                { title: "Account", value: "firstName" },
-                { title: "Group", value: "group" },
-                { title: "Phone", value: "phone" },
-                { title: "NIC", value: "nic" },
-                { title: "Salesman", value: "salesman" },
-                { title: "City", value: "townCity" },
+                // { title: "Image", key: "img" , sortable: false },
+                { title: "Account", value: "firstName",sortable: false },
+                { title: "Group", value: "group",sortable: false },
+                { title: "Phone", value: "phone",sortable: false },
+                { title: "NIC", value: "nic",sortable: false },
+                { title: "Salesman", value: "salesman",sortable: false },
+                { title: "City", value: "townCity",sortable: false },
                 { title: "Action", key: 'view', sortable: false },
             ],
         };
@@ -133,8 +126,7 @@ export default {
             this.loading = true;
             try {
 
-                const res = await UserModel.all(this.filter);
-                // console.log(res);
+                const res = await generalModel.get("/api/users",this.filter);
                 this.items = res.data;
                 this.totalItems = res.total;
                 this.filter.offset = res.offset;
