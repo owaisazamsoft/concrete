@@ -3,15 +3,15 @@
         <td width="600px" class="top">
             <table width="100%" class="">
                 <tr>
-                    <td style="width:110px;" class="top"  >
-                        <img style="width:110px" 
+                    <td style="width:90px;" class="top"  >
+                        <img style="width:90px" 
                         src="{{ !request()->has('view') 
                                 ? public_path('assets/images/invoice-logo.png') 
                                 : asset('assets/images/invoice-logo.png') }}" />
                     </td>
-                    <td class="center" >
-                        <h1>M. Tariq Machinery</h1>
-                        <h1>Blocks Works</h1>
+                    <td class="center top" >
+                        <h1>M. Tariq</h1>
+                        <h1 style="font-size: 30px" >Machinery Blocks Works</h1>
                          {{-- <div style="width:500px;font-size:20px;display:block;">
                             Blocks Works
                         </div> --}}
@@ -21,7 +21,7 @@
                 </tr>
             </table>
         </td>
-        <td class="top right">
+        <td class="center right">
             <div class="bold" style="font-size:14px" >Contact</div>
             <!-- <div style="font-size:13px">M.tariq</div> -->
             <div class="bold" style="font-size:14px">0302-6841570</div>
