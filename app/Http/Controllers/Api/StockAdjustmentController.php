@@ -25,7 +25,16 @@ class StockAdjustmentController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = StockAdjustment::with('product');
+        $baseQuery = StockAdjustment::with('product')
+        ->when($request->search, function ($q, $search) {
+            $q->where('remarks', 'like', "%{$search}%");
+        })
+        ->when($request->product_id, function ($q, $search) {
+            $q->where('product_id',$search);
+        })
+        ->when($request->date, function ($q, $search) {
+               $q->whereDate('date',$search);
+        });
 
             // ✅ Clone the query before using count()
             $count = (clone $baseQuery)->count();

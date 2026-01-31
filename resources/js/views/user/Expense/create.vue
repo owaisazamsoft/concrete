@@ -7,9 +7,7 @@
   >
     <v-card-text>
       <v-row class="pt-3">
-
-
-
+        
         <!-- Date -->
         <v-col cols="12" sm="6">
           <label class="form-label">Date</label>
@@ -67,9 +65,6 @@
       <v-btn color="primary"  @click="submitForm">
         Submit
       </v-btn>
-      <!-- <v-btn color="danger" variant="flat" @click="resetForm">
-        Cancel
-      </v-btn> -->
     </div>
   </v-card>
 </template>
@@ -77,8 +72,9 @@
 
 <script>
 
-import expenseModel from "@/models/expense.model";
+
 import ExpenseCategory from "@/components/ExpenseCategory.vue";
+import generalModel from "@/models/general.model";
 
 
 
@@ -89,9 +85,7 @@ export default {
   data() {
     return {
       loading: false,
-
       form: {
-        
         date: "",
         debit: "",
         credit: "",
@@ -111,23 +105,14 @@ export default {
     async submitForm() {
       this.loading = true;
       try {
-        const formData = new FormData();
-
-        Object.keys(this.form).forEach(key => {
-          if (this.form[key] !== "" && this.form[key] !== null) {
-            formData.append(key, this.form[key]);
-          }
-        });
-
-        const res = await expenseModel.create(formData);
-
-        this.$alertStore.add(res.message || "Expense created", "success");
-        // this.$router.push(`/user/expense/edit/${res.data.id}`);
+      
+        const res = await generalModel.post('/api/expenses',this.form);
+        this.$alertStore.add(res.message, "success");
         this.$router.push("/user/expense");
 
       } catch (error) {
         console.error(error);
-        this.$alertStore.add(error.message || "Failed to submit", "error");
+        this.$alertStore.add(error.message, "error");
       } finally {
         this.loading = false;
       }

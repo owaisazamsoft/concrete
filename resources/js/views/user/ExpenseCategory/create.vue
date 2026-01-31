@@ -6,20 +6,17 @@
                 <label class="form-label">Title</label>
                 <v-text-field v-model="form.title" height="38px" placeholder="Enter title" />
             </v-col>
-
-
         </v-row>
     </v-card-text>
 
      <div class="mt-3 text-center">
       <v-btn color="primary"  @click="submitForm">Submit</v-btn>
-      <!-- <v-btn color="danger" variant="flat" @click="resetForm">Cancel</v-btn> -->
     </div>
   </v-card>
 </template>
 
 <script>
-import expenseCategoryModel from "@/models/expensecategory.model";
+import generalModel from "@/models/general.model";
 export default {
   data() {
     return {
@@ -30,37 +27,28 @@ export default {
     }
   },
   computed: {
-    imagePreview() {
-      if (!this.form.image) return null;
-      return URL.createObjectURL(this.form.image);
-    }
+  
   },
   methods: {
     async submitForm() {
         this.loading = true;
 
-        try {
-            let formData = new FormData();
-            formData.append('title', this.form.title);
-            
-            let res = await expenseCategoryModel.create(formData);
+        try {        
+
+            let res = await generalModel.post('/api/expenseCategory',this.form);
             this.$alertStore.add(res.message, 'success');
             this.$router.push('/user/expensecategory');
 
         } catch (error) {
-            console.error(error);
             this.$alertStore.add(error.message, 'error');
         } finally {
             this.loading = false;
             this.resetForm();
         }
+
     },
 
-    resetForm() {
-      this.form = {
-        title: '',
-      };
-    }
+
   }
 }
 </script>

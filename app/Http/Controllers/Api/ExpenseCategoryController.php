@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserProfileResource;
 use App\Models\Category;
+use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -25,25 +26,29 @@ class ExpenseCategoryController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = ExpenseCategory::query();
 
-            // ✅ Clone the query before using count()
-            $count = (clone $baseQuery)->count();
-            $data = $baseQuery->select([
-                        '*'                       
-                ])
-                ->orderByDesc('id')
-                ->skip($offset)
-                ->take($length)
-                ->get();
+        $baseQuery = ExpenseCategory::when($request->search, function ($q, $search) {
+            $q->where('title', 'like', "%{$search}%");
+        });
 
-            return response()->json([
-                'total' => $count,
-                'page' => $page,
-                'offset' => $offset,
-                'last_page' => ceil($count / $length),
-                'data' => $data,
-            ]);
+
+        // ✅ Clone the query before using count()
+        $count = (clone $baseQuery)->count();
+        $data = $baseQuery->select([
+                    '*'                       
+            ])
+            ->orderByDesc('id')
+            ->skip($offset)
+            ->take($length)
+            ->get();
+
+        return response()->json([
+            'total' => $count,
+            'page' => $page,
+            'offset' => $offset,
+            'last_page' => ceil($count / $length),
+            'data' => $data,
+        ]);
 
     }
 
@@ -126,6 +131,12 @@ class ExpenseCategoryController extends Controller
         $model = ExpenseCategory::find($id);
         if(!$model){
             return response()->json(['message' => 'Record Not Found'],400);
+        }
+
+        if(Expense::where('category_id',$id)->first()){
+            return response()->json([
+                'message' => 'Cannot Delete Category It Used In Expense'
+            ],400);
         }
 
         $model->delete();

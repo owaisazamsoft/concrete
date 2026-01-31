@@ -26,7 +26,16 @@ class ExpenseController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = Expense::with('category');
+        $baseQuery = Expense::with('category')
+        ->when($request->search, function ($q, $search) {
+            $q->where('remarks', 'like', "%{$search}%");
+        })
+        ->when($request->date, function ($q, $search) {
+            $q->whereDate('date',$search);
+        })
+        ->when($request->category_id, function ($q, $search) {
+            $q->where('category_id',$search);
+        });
 
             // ✅ Clone the query before using count()
             $count = (clone $baseQuery)->count();
@@ -55,7 +64,8 @@ class ExpenseController extends Controller
         $validator = Validator::make($request->all(),[
             'remarks' => 'required|string|max:1000',
             'date' => 'required|string|max:1000',
-            'debit' => 'required|numeric|min:0',
+            'debit' => 'nullable|numeric',
+            'credit' => 'nullable|numeric',
             'category_id' =>['nullable','integer','max:10',Rule::exists('expense_category','id')],
             'user_id' =>['nullable','integer','max:10',Rule::exists('users','id')],
         ]);
@@ -70,6 +80,7 @@ class ExpenseController extends Controller
         $model->remarks = $request->remarks;
         $model->date = $request->date;
         $model->debit = $request->debit;
+        $model->credit = $request->credit;
         $model->category_id = $request->category_id;
         $model->user_id = $request->user_id;
         $model->save();
@@ -110,7 +121,8 @@ class ExpenseController extends Controller
         $validator = Validator::make($request->all(),[
             'remarks' => 'required|string|max:1000',
             'date' => 'required|string|max:1000',
-            'debit' => 'required|numeric|min:0',
+            'debit' => 'nullable|numeric',
+            'credit' => 'nullable|numeric',
             'category_id' =>['nullable','integer','max:10',Rule::exists('expense_category','id')],
             'user_id' =>['nullable','integer','max:10',Rule::exists('users','id')],
         ]);
@@ -125,6 +137,7 @@ class ExpenseController extends Controller
         $model->remarks = $request->remarks;
         $model->date = $request->date;
         $model->debit = $request->debit;
+        $model->credit = $request->credit;
         $model->category_id = $request->category_id;
         $model->user_id = $request->user_id;
         $model->save();

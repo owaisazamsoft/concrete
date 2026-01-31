@@ -2,26 +2,37 @@
   <v-row>
     <v-col cols="12">
       <v-card title="Category" subtitle="View All Category Details">
-        <v-card-text>
-   
-          <div class="d-flex flex-wrap pb-3 pt-3">
-            <v-select 
-              label="Length" 
-              v-model="filter.length" 
-              :items="[10, 20, 30]"  
-              max-width="100px"
-            />
-            <v-text-field
-              class="ml-2"
-              label="Search"
-              v-model="filter.search"
-              max-width="200px"
-              clearable
-              persistent-placeholder
-            />
-            <v-btn class="ml-2" color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
-            <v-btn class="ml-2" color="success" variant="flat" prepend-icon="mdi-plus" :to="`/user/category/create`"></v-btn>
-          </div>
+        <v-card-text>          
+          <v-row class="d-flex flex-row py-3" align="center" no-gutters="" >
+            <v-col cols="auto" class="py-2" >
+              <v-select 
+                label="Length" 
+                v-model="filter.length" 
+                :items="generalStore.sort"  
+                max-width="100px"
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2" >
+              <v-text-field
+                label="Search"
+                v-model="filter.search"
+                max-width="200px"
+                min-width="150px"
+                clearable
+                persistent-placeholder
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2 px-1" >
+              <v-btn color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
+            </v-col>
+            <v-col cols="auto" class="py-2 px-1" >
+              <v-btn  color="success" variant="flat" prepend-icon="mdi-plus" :to="`/user/category/create`"></v-btn>
+            </v-col>
+            <v-col cols="auto" class="py-2">
+              Showing {{ filter.offset }}  of {{ totalItems}} Records
+            </v-col>      
+          </v-row>
+      
 
           <v-data-table-server class="border striped-table" 
             :headers="headers"
@@ -39,14 +50,14 @@
                  <v-btn color="warning" variant="flat" :to="`/user/category/edit/${item.id}`">
                     <v-icon>mdi-square-edit-outline</v-icon>
                 </v-btn>
-            <span class="px-1"> </span>
-            <v-btn
-                color="danger"
-                variant="flat"
-                @click="deleteItem(item.id)"
-                >
-                <v-icon>mdi-delete</v-icon>
-                </v-btn>
+                <span class="px-1"> </span>
+                <v-btn
+                    color="danger"
+                    variant="flat"
+                    @click="deleteItem(item.id)"
+                    >
+                    <v-icon>mdi-delete</v-icon>
+                    </v-btn>
             </template>
 
             <template v-slot:bottom>
@@ -66,11 +77,13 @@
 
 <script>
 import categoryModel from "@/models/category.model";
+import { useGeneralStore } from "@/stores/generalStore";
 
 export default {
   data() {
     return {
-      filter: { search: "", length: 10, page: 1, offset: 0 },
+      generalStore:useGeneralStore(),
+      filter: { search: "", length: null, page: 1, offset: 0 },
       items: [],
       totalItems: 0,
       last_page: 1,
@@ -83,6 +96,8 @@ export default {
     };
   },
   mounted() {
+    
+    this.filter.length = this.generalStore.sort[0];
     this.loadItems();
   },
   methods: {

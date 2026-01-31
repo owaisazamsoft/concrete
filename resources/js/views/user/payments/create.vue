@@ -67,16 +67,8 @@
         </v-col>
 
          <div class="mt-3 text-center w-100">
-                <v-btn class="mr-1" color="primary" @click="submitForm">
-                Submit
-              </v-btn>
-              <!-- <v-btn color="danger" variant="flat" @click="resetForm">
-                Cancel
-              </v-btn> -->
+              <v-btn class="mr-1" color="primary" @click="submitForm">Submit</v-btn>
         </div>
-
-        
-
       </v-row>
     </v-card-text>
      </v-card>
@@ -85,10 +77,8 @@
 
 
 <script>
-import paymentModel from "@/models/payment.model";
 import UserDropdown from "@/components/UserDropdown.vue";
-
-
+import generalModel from "@/models/general.model";
 
 export default {
   components:{
@@ -97,7 +87,6 @@ export default {
   data() {
     return {
       loading: false,
-
       form: {
         type:null,
         date: "",
@@ -120,13 +109,13 @@ export default {
       this.loading = true;
       try {
 
-        const res = await paymentModel.create(this.form);
-        this.$alertStore.add(res.message || "Payment created", "success");
+        const res = await generalModel.post('/api/payments',this.form);
+        this.$alertStore.add(res.message, "success");
         this.$router.push("/user/payments");
 
       } catch (error) {
         console.error(error);
-        this.$alertStore.add(error.message || "Failed to submit", "error");
+        this.$alertStore.add(error.message, "error");
       } finally {
         this.loading = false;
       }

@@ -7,10 +7,9 @@ export const useGeneralStore = defineStore('general', {
         menuType: 'expanded',
         themeMode: 'dark',
         sort: [
-            50,
+            20,
             100,
             500,
-            1000
         ],
     }),
 

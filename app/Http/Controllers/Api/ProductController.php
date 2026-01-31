@@ -26,16 +26,28 @@ class ProductController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = Product::with(['unit','category']);
+        $baseQuery = Product::leftJoin('unit','unit.id','=','products.unit_id')
+        ->leftJoin('category','category.id','=','products.category_id')
+        ->when($request->search, function ($q, $search) {
+                $q->where('products.title', 'like', "%{$search}%")
+                 ->orWhere('products.sku', 'like', "%{$search}%")
+                ->orWhere('category.title', 'like', "%{$search}%")
+                ->orWhere('unit.title', 'like', "%{$search}%");
 
-        
+        });
+
+
+
+
 
             // ✅ Clone the query before using count()
             $count = (clone $baseQuery)->count();
             $data = $baseQuery->select([
-                        '*'                       
+                    'products.*',
+                    'category.title as category_name',
+                    'unit.title as unit_name',
                 ])
-                ->orderByDesc('id')
+                ->orderByDesc('products.id')
                 ->skip($offset)
                 ->take($length)
                 ->get()

@@ -16,26 +16,22 @@
 
         <!-- Debit -->
         <v-col cols="12" sm="6">
-          <label class="form-label">Amount</label>
+          <label class="form-label">Debit</label>
           <v-text-field v-model="form.debit" type="number" />
         </v-col>
 
-        <!-- Credit -->
-        <!-- <v-col cols="12" sm="6">
+        <v-col cols="12" sm="6">
           <label class="form-label">Credit</label>
           <v-text-field v-model="form.credit" type="number" />
-        </v-col> -->
+        </v-col>
 
         <!-- Category -->
         <v-col cols="12" sm="6">
           <label class="form-label">Category</label>
-          <v-select
+          <ExpenseCategory 
             v-model="form.category_id"
-            :items="categories"
-            item-title="title"
-            item-value="id"
-            clearable
-          />
+            clearable  
+            placeholder="Select category" />
         </v-col>
 
         <!-- Remarks -->
@@ -48,22 +44,18 @@
     </v-card-text>
 
      <div class="mt-16 text-center">
-      <v-btn color="primary"  @click="submitForm">
-        Update
-      </v-btn>
-      <!-- <v-btn color="danger" variant="flat" @click="resetForm">
-        Cancel
-      </v-btn> -->
+      <v-btn color="primary"  @click="submitForm">Update</v-btn>
     </div>
   </v-card>
 </template>
 
 
 <script>
-import expenseCategoryModel from "@/models/expensecategory.model";
-import expenseModel from "@/models/expense.model";
+import ExpenseCategory from "@/components/ExpenseCategory.vue";
+import generalModel from "@/models/general.model";
 
 export default {
+ components:{ExpenseCategory},
   data() {
     return {
       loading: false,
@@ -71,7 +63,7 @@ export default {
       form: {
         date: "",
         debit: "",
-        
+        credit:"",
         remarks: "",
         category_id: null,
       },
@@ -79,65 +71,48 @@ export default {
   },
 
   mounted() {
-    this.loadCategories();
+   
     this.loadExpense();
   },
 
   methods: {
-    async loadCategories() {
-      const res = await expenseCategoryModel.all();
-      this.categories = res.data;
-    },
 
     async loadExpense() {
       this.loading = true;
       try {
-        const id = this.$route.params.id;
-        const res = await expenseModel.find(id);
 
+        const id = this.$route.params.id;
+        const res = await generalModel.get('/api/expenses/'+id,{});
         const data = res.data;
-        console.log(data)
         this.form.date = data.date;
         this.form.debit = data.debit;
         this.form.remarks = data.remarks;
         this.form.category_id = data.category_id;
 
       } catch (e) {
-        this.$alertStore.add("Failed to load expense", "error");
+        this.$alertStore.add(e.message, "error");
       } finally {
         this.loading = false;
       }
     },
 
     async submitForm() {
+
       this.loading = true;
       try {
         const id = this.$route.params.id;
-        const formData = new FormData();
-
-        Object.keys(this.form).forEach(key => {
-          if (this.form[key] !== "" && this.form[key] !== null) {
-            formData.append(key, this.form[key]);
-          }
-        });
-
-        formData.append("_method", "put");
-
-        const res = await expenseModel.update(id, formData);
-
-        this.$alertStore.add(res.message || "Expense updated", "success");
+        const res = await generalModel.put("/api/expenses/"+id,this.form);
+        this.$alertStore.add(res.message, "success");
         this.$router.push("/user/expense");
 
       } catch (error) {
-        this.$alertStore.add(error.message || "Update failed", "error");
+        this.$alertStore.add(error.message, "error");
       } finally {
         this.loading = false;
       }
     },
 
-    resetForm() {
-      this.loadExpense();
-    }
+  
   },
 };
 </script>

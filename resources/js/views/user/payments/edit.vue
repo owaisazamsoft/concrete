@@ -84,6 +84,7 @@
 
 import paymentModel from "@/models/payment.model";
 import UserDropdown from "@/components/UserDropdown.vue";
+import generalModel from "@/models/general.model";
 
 export default {
     components:{
@@ -92,7 +93,6 @@ export default {
   data() {
     return {
       loading: false,
-
       form: {
         _method:'put',
         date: "",
@@ -106,7 +106,6 @@ export default {
   },
 
   mounted() {
- 
     this.loadExpense();
   },
 
@@ -115,40 +114,42 @@ export default {
     async loadExpense() {
       this.loading = true;
       try {
-        const id = this.$route.params.id;
-        const res = await paymentModel.find({id});
 
+        const id = this.$route.params.id;
+        const res = await generalModel.get('/api/payments/'+id,{});
         const data = res.data;
-        console.log(data)
         this.form.date = data.date;
+
         if(data.type == 'debit'){
             this.form.amount = data.debit;
         }else{
             this.form.amount = data.credit;
         }
-        this.form.type = data.type;
-        this.form.remarks = data.remarks;
-        this.form.description = data.description;
-        this.form.user_id = data.user_id;
+        
+          this.form.type = data.type;
+          this.form.remarks = data.remarks;
+          this.form.description = data.description;
+          this.form.user_id = data.user_id;
 
       } catch (e) {
-        this.$alertStore.add("Failed to load expense", "error");
+          this.$alertStore.add(e.message, "error");
       } finally {
-        this.loading = false;
+          this.loading = false;
       }
     },
+
 
     async submitForm() {
       this.loading = true;
       try {
 
         const id = this.$route.params.id; 
-        const res = await paymentModel.update(id, this.form);
+        const res = await generalModel.put('/api/payments/'+id,this.form);
         this.$alertStore.add(res.message || "Payment updated", "success");
         this.$router.push("/user/payments");
 
       } catch (error) {
-        this.$alertStore.add(error.message || "Update failed", "error");
+        this.$alertStore.add(error.message);
       } finally {
         this.loading = false;
       }

@@ -65,15 +65,15 @@
 
      <div class="mt-16 text-center">
       <v-btn color="primary" @click="submitForm">Update</v-btn>
-      <!-- <v-btn color="danger" variant="flat" @click="resetForm">Cancel</v-btn> -->
+    
    </div>
   </v-card>
 </template>
 
 <script>
-import ProductsModel from "@/models/product.model";
 import CategoryDropdown from "@/components/CategoryDropdown.vue";
 import UnitDropdown from "@/components/UnitDropdown.vue";
+import generalModel from "@/models/general.model";
 
 export default {
   components:{
@@ -89,7 +89,7 @@ export default {
         price: '',
         unit_id: null,
         category_id: null,
-        description: '',
+        description: null,
         image: null,
       },
       originalImage: null,
@@ -108,56 +108,63 @@ export default {
   },
   methods: {
     async loadInventory() {
+
       this.loading = true;
       try {
-        const id = this.$route.params.id;
-        const res = await ProductsModel.find({ id });
-        const data = res.data;
 
-        this.form.title = data.title;
-        this.form.sku = data.sku;
-        this.form.price = data.price;
-        this.form.unit_id = data.unit_id;
-        this.form.category_id = data.category_id;
-        this.form.description = data.description;
-        this.originalImage = data.image_preview;
+          const id = this.$route.params.id;
+          const res = await generalModel.get('/api/products/'+id,{});
+          const data = res.data;
+
+          this.form.title = data.title;
+          this.form.sku = data.sku;
+          this.form.price = data.price;
+          this.form.unit_id = data.unit_id;
+          this.form.category_id = data.category_id;
+          this.form.description = data.description;
+          this.originalImage = data.image_preview;
+
       } catch (error) {
-        console.error(error);
-        this.$alertStore.add("Failed to load inventory", "error");
+          console.error(error);
+          this.$alertStore.add(error.message, "error");
       } finally {
-        this.loading = false;
+          this.loading = false;
       }
+
     },
 
+
+
     async submitForm() {
-    this.loading = true;
-    try {
-        const formData = new FormData();
 
-        formData.append('title', this.form.title);
-        formData.append('sku', this.form.sku);
-        formData.append('price', this.form.price);
-        formData.append('unit_id', this.form.unit_id);
-        formData.append('category_id', this.form.category_id);
-        formData.append('description', this.form.description);
+        this.loading = true;
+        try {
 
-        if (this.form.image instanceof File) {
-        formData.append('image', this.form.image);
+            if (this.form.image instanceof File) {
+                if(this.form.image.type != "image/png"){
+                   this.$alertStore.add("Invalid Extension Allow Only",'error');
+                   return false;
+                }
+
+                const maxSize = 500 * 1024;
+                if(this.form.image.size > maxSize){
+                   this.$alertStore.add("Image Size Can Not Be Greater Than 500kb",'error');
+                   return false;
+                }
+
+            }
+
+            const id = this.$route.params.id;
+            const res = await generalModel.put('/api/products/'+id,this.form);
+            this.$alertStore.add(res.message, 'success');
+            this.$router.push(`/user/inventory`);
+            
+          
+        } catch (error) {
+            this.$alertStore.add(error.message,'error');
+        } finally {
+            this.loading = false;
         }
-
-        const id = this.$route.params.id;
-
-        const res = await ProductsModel.update(id, formData);
-
-        this.$alertStore.add(res.message || 'Inventory updated', 'success');
-        // this.$router.push('/user/inventory');
-
-    } catch (error) {
-        console.error(error);
-        this.$alertStore.add(error.message || 'Failed to submit', 'error');
-    } finally {
-        this.loading = false;
-    }
     },
 
 

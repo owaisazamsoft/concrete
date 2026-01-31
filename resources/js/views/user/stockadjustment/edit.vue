@@ -116,12 +116,12 @@ export default {
       try {
 
           const id = this.$route.params.id;
-          let res = await generalModel.put('/api/stockadjustment/' + id, this.form);
+          let res = await generalModel.put('/api/stockadjustment/'+id,this.form);
           this.$alertStore.add(res.message, "success");
           this.$router.push("/user/stockadjustment");
 
       } catch (e) {
-          this.$alertStore.add("Update failed", "error");
+          this.$alertStore.add(e.message,"error");
       } finally {
           this.loading = false;
       }

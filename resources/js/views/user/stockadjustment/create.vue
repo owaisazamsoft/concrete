@@ -15,7 +15,6 @@
             density="compact"
           />
         </v-col>
-
         <v-col cols="12" sm="4">
           <label class="form-label">Product</label>
           <ProductDropdown 
@@ -64,7 +63,6 @@
             placeholder="Optional remarks"
           />
         </v-col>
-
       </v-row>
     </v-card-text>
 
@@ -110,7 +108,7 @@ export default {
 
         try {
           
-            let res = await  GeneralModel.post("/api/stockadjustment",this.form);
+            let res = await GeneralModel.post("/api/stockadjustment",this.form);
             this.$alertStore.add(res.message, 'success');
             this.$router.push('/user/stockadjustment');
 
@@ -123,13 +121,6 @@ export default {
         }
 
     },
-
-
-    resetForm() {
-      this.form = {
-        title: '',
-      };
-    }
   }
 }
 </script>

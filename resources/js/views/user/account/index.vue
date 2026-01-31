@@ -5,40 +5,48 @@
                     <v-col cols="12" class="">                        
                         <v-card title="Accounts" subtitle="View All Accounts List" class="">
                             <v-card-text>
-                                <div class="pb-3 pt-3 d-flex flex-wrap ">
-                                    <div class="py-2">
+                                <v-row class="d-flex flex-row py-3" align="center" no-gutters >
+                                    <v-col cols="auto" class="py-2" >
                                         <v-select 
                                             label="Length" 
                                             v-model="filter.length" 
                                             :items="generalStore.sort"  
-                                            width="150"
+                                            width="150px"
                                              />
-                                    </div>
-                                    <div class="pl-2 py-2">
+                                    </v-col>
+                                    <v-col cols="auto" class="py-2">
                                         <v-select label="Group" 
                                             v-model="filter.group"
-                                            width="200"
+                                            width="200px"
                                             :items="['customer','employe']"
                                             persistent-placeholder
                                             clearable />
-                                    </div>
-                                    <div class="pl-2 py-2">
-                                        <v-text-field label="Search" 
+                                    </v-col>
+                                    <v-col cols="auto" class="py-2">
+                                         <v-text-field label="Search" 
                                             v-model="filter.search"
-                                            width="200"
+                                            width="200px"
                                             persistent-placeholder
                                             clearable />
-                                    </div>
-
-                                    <div class="pl-2 py-2">
+                                    </v-col>
+                                    <v-col cols="auto" class="py-2 px-1">
                                         <v-btn color="primary" variant="flat" prepend-icon="mdi-magnify"
-                                            @click="loadItems" />
-                                    </div>
-                                    <div class="pl-2 py-2">
-                                        <v-btn class="text-center" color="success" variant="flat"
-                                            prepend-icon="mdi-plus" to="/user/account/create" />
-                                    </div>
-                                </div>
+                                            @click="loadItems" class="" />
+                                    </v-col>
+                                     <v-col cols="auto" class="py-2 px-1">
+                                        <v-btn class="" color="success" variant="flat"
+                                            prepend-icon="mdi-plus" to="/user/account/create"
+                                            />
+                                     </v-col>
+                                    <v-col cols="auto" class="py-2">
+                                        <!-- <div class="align-self-center px-2"> -->
+                                            Showing {{ filter.offset }}  of {{ totalItems}}
+                                            Records
+                                        <!-- </div> -->
+                                    </v-col>
+                                    <!-- <v-spacer /> -->
+                                </v-row>
+                             
 
                                 <v-data-table-server class="border striped-table" :headers="headers" :items="items"
                                     :items-length="totalItems" 
@@ -89,7 +97,7 @@ export default {
         return {
             filter: {
                 search: '',
-                length: 50,
+                length: null,
                 page: 1,
                 offset: 0,
                 group:null,
@@ -116,7 +124,7 @@ export default {
        
     },
     mounted() {
-
+        this.filter.length = this.generalStore.sort[0];
         this.loadItems();
     },
     methods: {
@@ -137,6 +145,8 @@ export default {
           
                 this.totalItems = 0;
                 this.items = [];
+                this.$alertStore.add(error.message, 'error');
+
 
             } finally {
                 this.loading = false;

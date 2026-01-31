@@ -3,27 +3,46 @@
     <v-col cols="12">
       <v-card title="Items" subtitle="View All Items List">
         <v-card-text>
-          <div class="d-flex flex-wrap pb-3 pt-3">
-            <v-select 
-              label="Length"
-              max-width="100px" 
-              v-model="filter.length" 
-              :items="[10, 20, 30]"  
-              width="150"
-            />
-            <v-text-field
-              class="ml-2"
-              label="Search"
-              max-width="200px"
-              v-model="filter.search"
-              width="200"
-              clearable
-              persistent-placeholder
-            />
-            <v-btn class="ml-2" color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
-            <v-btn class="ml-2" color="success" variant="flat" prepend-icon="mdi-plus" :to="`/user/inventory/create`"></v-btn>
-          </div>
-
+          <v-row class="d-flex flex-row py-3" align="center" no-gutters="" >
+            <v-col cols="auto" class="py-2" >
+              <v-select 
+                label="Length"
+                max-width="100px" 
+                v-model="filter.length" 
+                :items="generalStore.sort"  
+                width="150px"
+                />
+            </v-col>
+            <v-col cols="auto" class="py-2" >
+              <v-text-field
+                label="Search"
+                max-width="200px"
+                v-model="filter.search"
+                min-width="200px"
+                clearable
+                persistent-placeholder
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2 px-1">
+               <v-btn class="" 
+                  color="primary" 
+                  variant="flat" 
+                  prepend-icon="mdi-magnify" 
+                  @click="loadItems"></v-btn>
+            </v-col>
+            <v-col cols="auto" class="py-2 px-1">
+                <v-btn 
+                  color="success" 
+                  variant="flat" 
+                  prepend-icon="mdi-plus" 
+                  :to="`/user/inventory/create`"></v-btn>
+            </v-col>
+            <v-col cols="auto" class="py-2" >
+                  Showing {{ filter.offset }} - {{ totalItems }} of {{ totalItems}}
+                  Records
+            </v-col>
+          </v-row>
+      
           <v-data-table-server class="border striped-table"
             :headers="headers"
             :items="items"
@@ -73,12 +92,19 @@
 </template>
 
 <script>
-import ProductsModel from "@/models/product.model";
+import generalModel from "@/models/general.model";
+import { useGeneralStore } from "@/stores/generalStore";
 
 export default {
   data() {
     return {
-      filter: { search: "", length: 10, page: 1, offset: 0 },
+      generalStore:useGeneralStore(),
+      filter: { 
+        search: "", 
+        length: null, 
+        page: 1, 
+        offset: 0 
+      },
       items: [],
       totalItems: 0,
       last_page: 1,
@@ -89,49 +115,54 @@ export default {
         { title: "Title", value: "title" },
         { title: "Sku", value: "sku" },
         { title: "Price", value: "price" },
-        { title: "Unit", value: "unit" },
-        { title: "Category", value: "category" },
+        { title: "Unit", value: "unit_name" },
+        { title: "Category", value: "category_name" },
         { title: "Actions", value: "actions", sortable: false },
       ],
     };
   },
   mounted() {
+    this.filter.length = this.generalStore.sort[0]; 
     this.loadItems();
   },
   methods: {
     async loadItems() {
+      
       this.loading = true;
       try {
-        const res = await ProductsModel.all(this.filter);
-        this.items = res.data;
-        this.totalItems = res.total;
-        this.last_page = res.last_page;
-        this.filter.page = Number(res.page);
-        this.filter.offset = res.offset;
+            const res = await generalModel.get('/api/products',this.filter);
+            this.items = res.data;
+            this.totalItems = res.total;
+            this.last_page = res.last_page;
+            this.filter.page = Number(res.page);
+            this.filter.offset = res.offset;
       } catch (error) {
-        this.items = [];
-        this.totalItems = 0;
+            this.items = [];
+            this.totalItems = 0;
       } finally {
-        this.loading = false;
+            this.loading = false;
       }
+
     },
     async deleteItem(id) {
+
         if (!confirm("Are you sure you want to delete this item?")) return;
 
-        this.loading = true;
+            this.loading = true;
         try {
-        const res = await ProductsModel.delete(id);
 
-        this.$alertStore.add(res.message || "Inventory deleted", "success");
-        this.loadItems(); 
+            const res = await generalModel.delete('/api/products/'+id,{});
+            this.$alertStore.add(res.message, "success");
+            this.loadItems(); 
 
         } catch (error) {
-        console.error(error);
-        this.$alertStore.add(error.message || "Delete failed", "error");
+            console.error(error);
+            this.$alertStore.add(error.message, "error");
         } finally {
         this.loading = false;
         }
     }
+
 
   },
 };

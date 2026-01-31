@@ -27,14 +27,26 @@ class PaymentController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = Payment::with('user');
+            $baseQuery = Payment::leftJoin('users','users.id','=','payments.user_id')
+            ->when($request->date, function ($q, $value) {
+
+                $q->whereDate('payments.date',$value);
+
+            })->when($request->user_id, function ($q, $value) {
+                $q->where('payments.user_id',$value);
+
+            })->when($request->search, function ($q, $search) {
+                $q->where('remarks', 'like', "%{$search}%");
+
+            });
 
             // ✅ Clone the query before using count()
-            $count = (clone $baseQuery)->count();
-            $data = $baseQuery->select([
-                        '*'                       
+                $count = (clone $baseQuery)->count();
+                $data = $baseQuery->select([
+                        'payments.*',
+                        'users.firstName',                       
                 ])
-                ->orderByDesc('id')
+                ->orderByDesc('payments.id')
                 ->skip($offset)
                 ->take($length)
                 ->get();
