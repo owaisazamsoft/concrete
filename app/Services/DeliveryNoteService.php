@@ -27,50 +27,60 @@ class DeliveryNoteService
      static public function search(Request $request)
     {   
         
-        return DeliveryNote::with([
-            'user',
-            'items',
-            'items.product',
-            'saleOrder',
-            'saleInvoiceItem'
-            
-        ])
+        return DeliveryNote::leftJoin('users','users.id','=','delivery_notes.user_id')
+        
         //Search
         ->when($request->search, function ($query, $search) {
             $query->where(function($q) use ($search) {
-                $q->where('ref', 'like', "%{$search}%")
-                ->orWhereHas('user', fn($q2) => $q2->where('fistName', 'like', "%{$search}%"))
-                ->orWhereHas('items.product', fn($q2) => $q2->where('title', 'like', "%{$search}%"));
+                $q->where('delivery_notes.ref', 'like', "%{$search}%")
+                ->orWhere('delivery_notes.prefix', 'like', "%{$search}%")
+                ->orWhere('delivery_notes.remarks', 'like', "%{$search}%");
             });
         })
+        
         // User Id
         ->when($request->user_id, function ($query, $value) {
-            $query->where('user_id',$value);
+            $query->where('delivery_notes.user_id',$value);
         })
+        
         //Start Date
         ->when($request->start_date, function ($query, $value) {
-            $query->whereDate('date', '>=', $value);
+            $query->whereDate('delivery_notes.date', '>=', $value);
         })
+        
         // End Date
         ->when($request->end_date, function ($query, $value) {
-            $query->whereDate('date', '<=', $value);
+            $query->whereDate('delivery_notes.date', '<=', $value);
         })
-        ->orderByDesc('date')
+        
+        //Status
+        ->when(true,function ($query, $value) use($request) {
+            if($request->has('status') && $request->status != ''){
+                $query->where('delivery_notes.status', $request->status);
+            }
+        })
+        ->select([
+            'delivery_notes.*',
+            'users.firstName as user_name',
+        ])
+        ->orderByDesc('delivery_notes.date')
         ->paginate($request->length ?? 10)
         ->through(function ($invoice) {
             $invoice->date = date('d-M-Y', strtotime($invoice->date));
+            $invoice->titleWithRef = $invoice->ref.' - '.$invoice->prefix;
             return $invoice;
         });
 
     }
     
+
       static public function create($request)
     {   
 
-        $saleOrder = SaleOrderService::create($request);
+        // $saleOrder = SaleOrderService::create($request);
 
         $order = DeliveryNote::create([
-            'sale_order_id' => $saleOrder->id,
+            'sale_order_id' => null,
             'user_id'  => $request->user_id,
             'date'     => Carbon::parse($request->date),
             'ref'      => $request->ref,
@@ -115,7 +125,7 @@ class DeliveryNoteService
           throw new \Exception("Record with ID $id not found");
         }
     
-        SaleOrderService::Update($order->sale_order_id,$request);
+        // SaleOrderService::Update($order->sale_order_id,$request);
 
         $order->update([
             'date'     => Carbon::parse($request->date),
@@ -177,10 +187,9 @@ class DeliveryNoteService
         }
 
         DeliveryNoteItem::where('delivery_note_id',$id)->delete();
-
-
         $model->delete();
-        SaleOrder::where('id', $model->sale_order_id)->delete();
+        
+        // SaleOrder::where('id', $model->sale_order_id)->delete();
 
         return $model;
 

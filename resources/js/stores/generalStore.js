@@ -11,6 +11,14 @@ export const useGeneralStore = defineStore('general', {
             100,
             500,
         ],
+        status:[
+            { title: 'Active', value: 1 },
+            { title: 'Deactive', value: 0 },
+        ],
+        PaymentStatus:[
+            { title: 'Paid', value: 1 },
+            { title: 'UnPaid', value: 0 },
+        ],
     }),
 
     getters: {

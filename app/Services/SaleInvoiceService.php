@@ -2,14 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Auctions;
 use App\Models\DeliveryNote;
-use App\Models\Interest;
 use App\Models\SaleInvoice;
 use App\Models\SaleInvoiceItem;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Vehicle;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -25,37 +21,81 @@ class SaleInvoiceService
      static public function search(Request $request)
     {   
         
-        return SaleInvoice::with([
-            'user:id,firstName',
-            'items',
-            'items.deliveryNote',
-        ])
-        //Search
-        ->when($request->search, function ($query, $search) {
-            $query->where(function($q) use ($search) {
-                $q->where('ref', 'like', "%{$search}%")
-                ->orWhereHas('user', fn($q2) => $q2->where('fistName', 'like', "%{$search}%"))
-                ->orWhereHas('items.deliveryNote', fn($q2) => $q2->where('ref', 'like', "%{$search}%"));
+        $length = $request->input('length', 20);
+        $page   = $request->input('page', 1);
+        $offset = ($page - 1) * $length;
+
+        $query = SaleInvoice::leftJoin('users','users.id','=','sale_invoices.user_id')
+          
+            ->when($request->search, function ($q, $search) {
+                $q->where('sale_invoices.ref', 'like', "%{$search}%")
+                ->orWhere('sale_invoices.prefix', 'like', "%{$search}%");
+            })
+            ->when($request->dc_id, function ($query, $value){
+                $query->whereExists(function ($sub) use ($value) {
+                    $sub->select(DB::raw(1))
+                        ->from('sale_invoice_items')
+                        ->whereColumn('sale_invoice_items.sale_invoice_id', 'sale_invoices.id')
+                        ->where('sale_invoice_items.delivery_note_id', $value);
+                });
+            })
+
+            // User Id
+            ->when($request->user_id, function ($query, $value) {
+                $query->where('sale_invoices.user_id',$value);
+            })
+
+            //Start Date
+            ->when($request->start_date, function ($query, $value) {
+                $query->whereDate('sale_invoices.date', '>=', $value);
+            })
+
+            // End Date
+            ->when($request->end_date, function ($query, $value) {
+                $query->whereDate('sale_invoices.date', '<=', $value);
+            })
+            // Status
+            ->when(true,function ($query, $value) use($request) {
+                if($request->has('status') && $request->status != ''){
+                    $query->where('sale_invoices.status', $request->status);
+                }
+            })
+            // Is Paid
+            ->when(true,function ($query, $value) use($request) {
+                if($request->has('is_paid') && $request->is_paid != ''){
+                    $query->where('sale_invoices.is_paid', $request->is_paid);
+                }
             });
-        })
-        // User Id
-        ->when($request->user_id, function ($query, $value) {
-            $query->where('user_id',$value);
-        })
-        //Start Date
-        ->when($request->start_date, function ($query, $value) {
-            $query->whereDate('date', '>=', $value);
-        })
-        // End Date
-        ->when($request->end_date, function ($query, $value) {
-            $query->whereDate('date', '<=', $value);
-        })
-        ->orderByDesc('date')
-        ->paginate($request->length ?? 10)
-        ->through(function ($invoice) {
-            $invoice->date = date('d-M-Y', strtotime($invoice->date));
-            return $invoice;
-        });
+       
+
+            $count = (clone $query)->count();
+            $data = $query->select([
+                'sale_invoices.*',
+                'users.firstName as user_name',                       
+            ])
+            ->orderByDesc('sale_invoices.date')
+            ->skip($offset)
+            ->take($length)
+            ->get()
+            ->map(function($item){
+
+                $item->date = date('d-M-Y', strtotime($item->date));
+                return $item;
+            });
+
+        
+        
+            return response()->json([
+                'total' => $count,
+                'from' => $count > 0 ? $offset + 1 : 0,
+                'to'   =>  $offset + count($data),
+                'page' => $page,
+                'offset' => $offset + count($data),
+                'last_page' => ceil($count / $length),
+                'data' => $data,
+            ]);
+
+    
     }
 
     static public function create($request)
@@ -76,15 +116,21 @@ class SaleInvoiceService
         ]);
 
         $model->save();
-
         $model->generatePrefix();
-
 
 
         $subtotal = 0;
         foreach ($request->items as $key => $value) {
 
             $deliver_note = DeliveryNote::find($value['delivery_note_id']);
+            if(!$deliver_note){
+                throw new \Exception("Invalid DC");
+            }
+
+            if($dc = SaleInvoiceItem::where('delivery_note_id',$deliver_note->id)->first()){
+                throw new \Exception("Record with ID ".$deliver_note->ref." Already Added In ".$dc->parent->prefix);
+            }
+
             $SaleInvoiceItem = SaleInvoiceItem::create([
                 'sale_invoice_id' => $model->id,
                 "delivery_note_id" => $deliver_note->id,
@@ -100,6 +146,7 @@ class SaleInvoiceService
             $SaleInvoiceItem->save();
 
             $subtotal +=  $step;
+            
         }
 
 
@@ -192,4 +239,5 @@ class SaleInvoiceService
         SaleInvoiceItem::where('sale_invoice_id', $model->id)->delete();
         return $model;
     }
+
 }

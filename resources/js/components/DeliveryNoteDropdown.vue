@@ -1,10 +1,11 @@
 <template>
+ 
   <v-autocomplete
     v-bind="$attrs"
-    :model-value="modelValue"
+    :model-value="value"
     :items="data"
     :loading="loading"
-    @update:model-value="handleValue"
+    @update:model-value="$emit('update:value',$event)"
   />
 </template>
 
@@ -15,7 +16,7 @@ import generaApi from "@/models/general.model"
 export default {
   name: "DeliveryNoteDropdown",
   props: {
-    modelValue: {
+    value: {
       type: [Number, String,Boolean],
       default: null
     },
@@ -41,14 +42,14 @@ export default {
       }
     }
   },
-
+  emits: ['update:value'],
   methods: {
     async getData() {
       
-      if (!this.userId) {
-        this.data = []
-        return
-      }
+      // if (!this.userId) {
+      //   this.data = []
+      //   return
+      // }
 
       this.loading = true
       try {
@@ -57,11 +58,7 @@ export default {
           user_id: this.userId
         })
 
-        this.data = res.data.map(item => ({
-          id: item.id,
-          title:item.ref +' - '+ item.prefix,
-          total: Number(item.total || 0)
-        }))
+        this.data = res.data;
 
       } catch (e) {
         console.error("Delivery note load failed", e)
@@ -72,10 +69,9 @@ export default {
       }
     },
 
-    handleValue(val) {
-      this.$emit("update:value", val)
-    }
   }
+
+
 }
 </script>
 

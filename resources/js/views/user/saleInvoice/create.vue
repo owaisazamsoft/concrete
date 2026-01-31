@@ -18,7 +18,7 @@
           <v-col cols="12" sm="4">
             <v-select
               v-model="form.status"
-              :items="Config.Status"
+              :items="generalStore.status"
               item-title="title"
               item-value="value"
               label="Status"
@@ -27,7 +27,7 @@
                <v-col cols="3" sm="4">
                 <v-select 
                   v-model="form.is_paid" 
-                  :items="Config.Status" 
+                  :items="generalStore.PaymentStatus" 
                   item-title="title" 
                   item-value="value"  
                   label="Paid status" 
@@ -47,15 +47,16 @@
       <v-card-text>
         <v-row v-for="(item,i) in form.items" :key="i" class="mt-2">
           <v-col cols="8">
-            <DeliveryNoteDropdown
-              :modelValue="item.delivery_note_id"
-              :user-id="form.user_id"
-              item-title="title"
+            <v-autocomplete
+              :items="dcItems"
+              :model-value="item.delivery_note_id"
+              clearable
+              item-title="titleWithRef"
               item-value="id"
               return-object
               label="Delivery Note"
-              @update:loaded="handleCalculation"
-              @update:value="handleDeliveryNote($event,{...item,key:i})"
+              @update:model-value="handleDeliveryNote($event,{...item,key:i})"
+             
             />
           </v-col>
           <v-col cols="3">
@@ -88,7 +89,7 @@
     <v-card class="mt-3" title="Invoice Total">
       <v-card-text>
         <v-row>
-          <v-col cols="3">
+          <!-- <v-col cols="3">
             <v-text-field label="Subtotal" :model-value="form.subtotal" disabled />
           </v-col>
           <v-col cols="3">
@@ -96,7 +97,7 @@
           </v-col>
           <v-col cols="3">
             <v-text-field type="number" label="Tax" v-model="form.tax" @update:model-value="handleCalculation" />
-          </v-col>
+          </v-col> -->
           <v-col cols="3">
             <v-text-field label="Grand Total" :model-value="form.total" disabled />
           </v-col>
@@ -115,8 +116,8 @@
 <script>
 import UserDropdown from "@/components/UserDropdown.vue"
 import DeliveryNoteDropdown from "@components/DeliveryNoteDropdown.vue";
-import Config from "@/models/config.model";
 import generalModel from "@/models/general.model";
+import { useGeneralStore } from "@/stores/generalStore";
 
 export default {
   components: {
@@ -125,14 +126,16 @@ export default {
   },
   data() {
     return {
-      Config,
+      generalStore:useGeneralStore(),
       loading: false,
+      dcItems:[],
       form: {
         user_id: null,
         date: "",
         ref: "",
         remarks: "",
         status: 1,
+        is_paid: 0,
         items: [],
         subtotal:0,
         discount: 0,
@@ -142,11 +145,18 @@ export default {
     }
   },
   mounted() {
- 
     this.handleCalculation();
   },
   methods: {
     handleDeliveryNote(model,item){
+      if(!model){
+        this.form.items[item.key].delivery_note_id = null;
+        this.form.items[item.key].total = 0;
+        this.handleCalculation();
+        return false;
+        
+      }
+      
       this.form.items[item.key].delivery_note_id = model.id;
       this.form.items[item.key].total = model.total;
       this.handleCalculation()
@@ -175,7 +185,34 @@ export default {
       this.form.total = subtotal;
     },
 
+    async checkDuplicate() {
+        let items = this.form.items;
+        let hasDuplicate = false;
+
+        for (let i = 0; i < items.length; i++) {
+          for (let j = i + 1; j < items.length; j++) {
+            if (items[i].delivery_note_id && items[i].delivery_note_id === items[j].delivery_note_id) {
+               hasDuplicate = true;
+              break;
+            }
+          }
+        }
+
+        if (hasDuplicate) {
+       
+          return true; // Yes, there are duplicates
+        }
+
+        return false; // No duplicates found
+    },
     async submit() {
+
+      const hasDuplicate = await this.checkDuplicate();
+      if (hasDuplicate === true) {
+        this.$alertStore.add("Duplicate Record Found", "error");
+        return false; 
+      }
+
       this.loading = true
       try {
           let res = await generalModel.post("/api/saleInvoice",this.form)
@@ -191,7 +228,28 @@ export default {
 
   computed: {
 
-  }
+  },
+  watch: {
+    'form.user_id': {
+        immediate: true,
+         async handler(newVal, oldVal) {
+
+              if(!newVal){
+                this.dcItems = [];
+                return false;
+              }
+
+              try {
+                  let items = await generalModel.get('/api/deliveryNotes',{user_id:newVal,length:10000})
+                  this.dcItems = items.data;
+              } catch (error) {
+                  this.dcItems = [];
+                  alert(error.message);
+              }   
+
+          }
+      }
+  },
 }
 </script>
 

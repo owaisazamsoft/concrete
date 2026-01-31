@@ -33,10 +33,8 @@ class SaleInvoiceController extends Controller
 
        public function store(StoreSaleInvoiceRequest $request)
     {
-
          DB::beginTransaction();
         try {
-
              $data = SaleInvoiceService::create($request);
              DB::commit();
             return response()->json([
@@ -59,7 +57,7 @@ class SaleInvoiceController extends Controller
         try {
 
             // $data = SaleInvoiceService::show($id,$request);
-              $data = SaleInvoice::with(['items.deliveryNote', 'user'])
+            $data = SaleInvoice::with(['items.deliveryNote', 'user'])
             ->where('id', $id)
             ->first();
             if (!$data) {
@@ -69,12 +67,15 @@ class SaleInvoiceController extends Controller
                 'message' => "Record Created Successfuly",
                 'data' => $data
             ], 200);
+            
+
         } catch (\Throwable $th) {
-          
             return response()->json([
                 'message' => $th->getMessage(),
             ], 500);
         }
+
+
 
     }
 
@@ -132,7 +133,7 @@ class SaleInvoiceController extends Controller
             DB::commit();
             $data = SaleInvoiceService::update($id,$request);
             return response()->json([
-                'message' => "Record Created Successfuly",
+                'message' => "Record Updated Successfuly",
                 'data' => $data
             ], 200);
         } catch (\Throwable $th) {

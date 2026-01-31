@@ -16,6 +16,10 @@ class SaleInvoiceItem extends Model
         return $this->belongsTo(DeliveryNote::class, 'delivery_note_id');
     }
 
+    public function parent() {
+        return $this->belongsTo(SaleInvoice::class, 'sale_invoice_id');
+    }
+
   
 
     

@@ -172,9 +172,9 @@ export default {
           this.loading = false;
           const response = await generaApi.post(this.url,this.form);
           this.$alertStore.add(response.message, "success");
-          setTimeout(() => {
+          // setTimeout(() => {
             this.$router.push("/user/deliverynote");
-          }, 1000);
+          // }, 1000);
 
       } catch (e) {
           this.$alertStore.add(e.message,"error");

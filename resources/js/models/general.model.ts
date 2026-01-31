@@ -12,6 +12,18 @@ export default class     {
         1000,
     ];
 
+    static status = [
+        { title: 'Active', value: 1 },
+        { title: 'Deactive', value: 0 },
+    ];
+
+    static PaymentStatus = [
+        { title: 'Paid', value: 1 },
+        { title: 'UnPaid', value: 0 },
+    ];
+
+
+
     static async get(url:string,options:any) {
         
         try {
