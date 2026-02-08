@@ -24,7 +24,9 @@ class CategoryController extends Controller
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $length;
 
-        $baseQuery = Category::query();
+        $baseQuery = Category::when($request->search, function ($q, $search) {
+            $q->where('title', 'like', "%{$search}%");
+        });
 
             // ✅ Clone the query before using count()
             $count = (clone $baseQuery)->count();
@@ -44,6 +46,8 @@ class CategoryController extends Controller
                 'total' => $count,
                 'page' => $page,
                 'offset' => $offset,
+                'from' => $count > 0 ? $offset + 1 : 0,
+                'to'   =>  $offset + count($data),
                 'last_page' => ceil($count / $length),
                 'data' => $data,
             ]);

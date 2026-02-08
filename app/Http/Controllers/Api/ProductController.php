@@ -29,10 +29,12 @@ class ProductController extends Controller
         $baseQuery = Product::leftJoin('unit','unit.id','=','products.unit_id')
         ->leftJoin('category','category.id','=','products.category_id')
         ->when($request->search, function ($q, $search) {
+            $q->where(function($q) use ($search){
                 $q->where('products.title', 'like', "%{$search}%")
                  ->orWhere('products.sku', 'like', "%{$search}%")
                 ->orWhere('category.title', 'like', "%{$search}%")
                 ->orWhere('unit.title', 'like', "%{$search}%");
+             });
 
         });
 
@@ -60,6 +62,8 @@ class ProductController extends Controller
                 'total' => $count,
                 'page' => $page,
                 'offset' => $offset,
+                'from' => $count > 0 ? $offset + 1 : 0,
+                'to'   =>  $offset + count($data),
                 'last_page' => ceil($count / $length),
                 'data' => $data,
             ]);
@@ -125,7 +129,6 @@ class ProductController extends Controller
                 'description' => 'nullable|string|max:255',
                 'image' => 'nullable|image',
                 'price' => 'required|numeric',
-
                 'category_id' =>['required',Rule::exists('category','id')],
                 'user_id' =>['nullable',Rule::exists('users','id')],
                 'unit_id' =>['required',Rule::exists('unit','id')],
@@ -165,8 +168,6 @@ class ProductController extends Controller
 
         $model->save();
 
-     
-   
         return response()->json([
             'message' => "Record Updated Successfuly",
             'data' => $model,
@@ -188,9 +189,9 @@ class ProductController extends Controller
             return response()->json(['message' => 'This Record Used In Stock Adjustment'],400);
         }
 
-        if(SaleOrderItem::where('product_id',$model->product_id)->first()){
-            return response()->json(['message' => 'This Record Used In SaleOrder'],400);
-        }
+        // if(SaleOrderItem::where('product_id',$model->product_id)->first()){
+        //     return response()->json(['message' => 'This Record Used In SaleOrder'],400);
+        // }
 
         if(DeliveryNoteItem::where('product_id',$model->product_id)->first()){
             return response()->json(['message' => 'This Record Used In Delivery Note'],400);

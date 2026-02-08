@@ -3,44 +3,86 @@
     <v-col cols="12">
       <v-card :title="model?.title+ ' - Product '" subtitle="View All Details">
         <v-card-text>
-   
-          <div class="d-flex flex-wrap pb-3 pt-3">
-            <v-select 
-              label="Length"
-              max-width="100px" 
-              v-model="filter.length" 
-              :items="[10, 20, 30]"  
-              width="150"
-            />
-            <v-text-field
-              class="ml-2"
-              label="Search"
-              max-width="200px"
-              v-model="filter.search"
-              width="200"
-              clearable
-              persistent-placeholder
-            />
-            <v-btn class="ml-2" color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
-     
-          </div>
+          <v-row class="d-flex flex-row py-3" align="center" no-gutters>
+            <v-col cols="auto" class="py-2">
+                <v-select 
+                  label="Length"
+                  max-width="100px" 
+                  v-model="filter.length" 
+                  :items="generalStore.sort"  
+                  width="150"
+                />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+              <v-text-field
+                class="ml-2"
+                label="From Date"
+                max-width="200px"
+                type="date"
+                v-model="filter.from_date"
+                min-width="200px"
+                clearable
+                persistent-placeholder
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+              <v-text-field
+                class="ml-2"
+                label="To Date"
+                max-width="200px"
+                type="date"
+                v-model="filter.to_date"
+                min-width="200px"
+                clearable
+                persistent-placeholder
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+                <v-text-field
+                  class="ml-2"
+                  label="Search"
+                  max-width="200px"
+                  v-model="filter.search"
+                  width="200"
+                  clearable
+                  persistent-placeholder
+                />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+                <v-btn class="ml-2" 
+                  color="primary" 
+                  variant="flat"
+                  prepend-icon="mdi-magnify" 
+                  @click="loadItems"/>
+            </v-col>
+            <v-col cols="auto" class="py-2">
+                  Showing {{ from }} - {{ to }}   of {{ total}} Records
+            </v-col>
+          </v-row>
 
           <v-data-table-server class="border striped-table"
             :headers="headers"
             :items="items"
-            :items-length="totalItems"
+            :items-length="total"
             :loading="loading"
-            item-value="id"
-            @update:options="loadItems"
+            item-value="id"          
           >
-            <template #item.image="{ item }">
-              <v-img :src="item.image" width="60" height="50" contain></v-img>
+
+            <template #item.remarks="{ item }">
+                {{ item.remarks}}
             </template>
 
-            <template #item.actions="{ item }">
-                 <!-- <v-btn color="success" variant="plain"  :to="`/user/inventory/edit/${item.id}`">
+            <template #item.action="{ item }">
+
+                 <v-btn v-if="item.type == 'dc'" color="success" variant="plain" 
+                  :to="`/user/deliverynote/edit/${item.id}`">
                     <v-icon>mdi-eye</v-icon>
-                </v-btn> -->
+                </v-btn>
+
+                 <v-btn v-else-if="item.type == 'ad'" color="success" variant="plain" :to="`/user/stockadjustment/edit/${item.id}`">
+                    <v-icon>mdi-eye</v-icon>
+                </v-btn>
+
             </template>
             <template v-slot:bottom>
 
@@ -66,72 +108,80 @@
 </template>
 
 <script>
-import reportModel from "@/models/report.model";
-import customerLedger from "@/models/report.model";
+import generalModel from "@/models/general.model";
+import { useGeneralStore } from "@/stores/generalStore";
+
 
 export default {
   data() {
     return {
+      generalStore:useGeneralStore(),
       model:{},
       filter: {
         search: "",
         length: 10,
         page: 1,
-        offset: 0,
       },
+      offset:0,
+      from:0,
+      to:0,
 
       items: [],
 
-      totalItems: 0,
+      total: 0,
       last_page: 1,
       loading: false,
       stock:0,
 
       headers: [
         { title: "ID", value: "id", sortable: false },
-        { title: "Date", value: "date" },
-        { title: "Description", value: "remarks" },
-        { title: "Stock In", value: "stock_in" },
-        { title: "Stock Out", value: "stock_out" },
-        { title: "Stock", value: "balance" },
-        // { title: "Actions", value: "actions", sortable: false },
+        { title: "Date", value: "date" , sortable: false },
+        { title: "Description", value: "remarks" , sortable: false },
+        { title: "In", value: "stock_in" , sortable: false },
+        { title: "Out", value: "stock_out" , sortable: false },
+        { title: "Stock", value: "balance" , sortable: false },
+        { title: "Action", value: "action" , sortable: false },
+
       ],
     };
   },
 
   mounted() {
+
+    this.filter.length = this.generalStore.sort[0];
     this.loadItems();
+
   },
 
   methods: {
-    async loadItems(options = {}) {
+    async loadItems() {
+
       this.loading = true;
 
       try {
-        // ✅ datatable options sync
-        if (options.page) this.filter.page = options.page;
-        if (options.itemsPerPage) this.filter.length = options.itemsPerPage;
 
-        // 👇 single customer ledger (id from route)
-        const id = this.$route.params.id;
+          const id = this.$route.params.id;
+          const res = await  generalModel.get("/api/reports/inventoryDetail/"+id,this.filter);
 
-        const res = await reportModel.inventoryDetail(id, this.filter);
-
-        this.items = res.data ?? [];
-        this.totalItems = res.total ?? 0;
-        this.last_page = res.last_page ?? 1;
-        this.filter.page = Number(res.page ?? 1);
-        this.filter.offset = res.offset ?? 0;
-        this.model = res.prodcut;
-        this.stock = res.balance;
+          this.items = res.data;
+          this.total = res.total;
+          this.last_page = Number(res.last_page);
+          this.filter.page = Number(res.page);
+          this.offset = Number(res.offset);
+          this.from = Number(res.from);
+          this.to = Number(res.to);
+      
+          this.model = res.prodcut;
+          this.stock = res.balance;
 
       } catch (error) {
-        console.error(error);
-        this.items = [];
-        this.totalItems = 0;
+          console.error(error);
+          this.items = [];
+          this.totalItems = 0;
       } finally {
-        this.loading = false;
+          this.loading = false;
       }
+
     },
   },
 };

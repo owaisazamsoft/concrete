@@ -50,6 +50,8 @@ class StockAdjustmentController extends Controller
                 'total' => $count,
                 'page' => $page,
                 'offset' => $offset,
+                'from' => $count > 0 ? $offset + 1 : 0,
+                'to'   =>  $offset + count($data),
                 'last_page' => ceil($count / $length),
                 'data' => $data,
             ]);

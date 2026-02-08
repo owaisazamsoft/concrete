@@ -29,7 +29,7 @@
               <v-btn  color="success" variant="flat" prepend-icon="mdi-plus" :to="`/user/category/create`"></v-btn>
             </v-col>
             <v-col cols="auto" class="py-2">
-              Showing {{ filter.offset }}  of {{ totalItems}} Records
+              Showing {{ from }} - {{ to }}   of {{ totalItems}} Records
             </v-col>      
           </v-row>
       
@@ -77,17 +77,25 @@
 
 <script>
 import categoryModel from "@/models/category.model";
+import generalModel from "@/models/general.model";
 import { useGeneralStore } from "@/stores/generalStore";
 
 export default {
   data() {
     return {
       generalStore:useGeneralStore(),
-      filter: { search: "", length: null, page: 1, offset: 0 },
+      filter: { 
+        search: "", 
+        length: null, 
+        page: 1, 
+      },
       items: [],
       totalItems: 0,
       last_page: 1,
       loading: false,
+      from:0,
+      to:0,
+      offset:0,
       headers: [
         { title: "ID", value: "id" ,sortable: false },
         { title: "Title", value: "title" },
@@ -104,12 +112,15 @@ export default {
     async loadItems() {
       this.loading = true;
       try {
-        const res = await categoryModel.all(this.filter);
+        const res = await generalModel.get("/api/category",this.filter);
         this.items = res.data;
         this.totalItems = res.total;
         this.last_page = res.last_page;
         this.filter.page = Number(res.page);
-        this.filter.offset = res.offset;
+       
+        this.offset = Number(res.offset);
+        this.from = Number(res.from);
+        this.to = Number(res.to);
       } catch (error) {
         this.items = [];
         this.totalItems = 0;

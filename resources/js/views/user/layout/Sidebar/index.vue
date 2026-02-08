@@ -22,7 +22,11 @@
                           :title="item.label" 
                           :prepend-icon="item.icon" />
                     </template>
-                    <v-list-item v-for="child in item.children" :title="child.label" :to="child.path" />
+                    <v-list-item v-for="child in item.children" 
+                       :title="child.label" 
+                       :to="child.path"
+                       :active="$route.path.startsWith(child.path)"
+                       />
                 </v-list-group>
 
                 <v-list-item  v-else
@@ -31,6 +35,7 @@
                     :prepend-icon="item.icon" 
                     :ripple="false"
                     :hide-overlay="false"
+                    :active="$route.path.startsWith(item.path)"
                     class=""
                     active-class="bg-primary on-primary  rounded my-active-menu hide-overlay">
                     <template #title>

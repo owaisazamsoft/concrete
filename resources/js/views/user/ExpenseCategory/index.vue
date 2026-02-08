@@ -20,12 +20,17 @@
                 :to="`/user/expensecategory/create`"></v-btn>
             </v-col>
             <v-col cols="auto" class="py-2">
-              Showing {{ filter.offset }}  of {{ totalItems}} Records
+              Showing {{ from }} - {{ to }}   of {{ totalItems}} Records
             </v-col> 
           </v-row>
 
-          <v-data-table-server :headers="headers" :items="items" :items-length="totalItems" :loading="loading"
-            item-value="id" @update:options="loadItems">
+          <v-data-table-server class="border striped-table"
+            :headers="headers" 
+            :items="items" 
+            :items-length="totalItems" 
+            :loading="loading"
+            item-value="id" 
+            >
             <template #item.image="{ item }">
               <v-img :src="item.image" width="60" height="50" contain></v-img>
             </template>
@@ -64,8 +69,10 @@ export default {
         search: "",
         length: null,
         page: 1,
-        offset: 0
       },
+      offset:0,
+      from:0,
+      to:0,
       items: [],
       totalItems: 0,
       last_page: 1,
@@ -78,8 +85,9 @@ export default {
     };
   },
   mounted() {
-    this.loadItems();
     this.filter.length = this.generalStore.sort[0];
+    this.loadItems();
+    
 
   },
   methods: {
@@ -92,7 +100,9 @@ export default {
         this.totalItems = res.total;
         this.last_page = res.last_page;
         this.filter.page = Number(res.page);
-        this.filter.offset = res.offset;
+        this.offset = Number(res.offset);
+        this.from = Number(res.from);
+        this.to = Number(res.to);
       } catch (error) {
         this.items = [];
         this.totalItems = 0;

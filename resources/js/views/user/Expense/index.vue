@@ -32,7 +32,7 @@
                   <v-text-field
                     label="Search"
                     v-model="filter.search"
-                    min-width="150px"
+                    min-width="200px"
                     clearable
                     persistent-placeholder
                   />
@@ -44,17 +44,17 @@
                   <v-btn class="ml-2" color="success" variant="flat" prepend-icon="mdi-plus" :to="`/user/expense/create`"></v-btn>
                </v-col>
                <v-col cols="auto" class="py-2">
-                  Showing {{ filter.offset }}  of {{ totalItems}} Records
+                  Showing {{ from }} - {{ to }}   of {{ totalItems}} Records
                 </v-col>
           </v-row>
 
-          <v-data-table-server
+          <v-data-table-server class="border striped-table"
             :headers="headers"
             :items="items"
             :items-length="totalItems"
             :loading="loading"
             item-value="id"
-            @update:options="loadItems"
+         
           >
          
             <template #item.actions="{ item }">
@@ -97,9 +97,18 @@ export default {
   data() {
     return {
       generalStore:useGeneralStore(),
-      filter: { search: "", length: null, page: 1, offset: 0,date:null,category_id:null },
+      filter: { 
+        search: "", 
+        length: null, 
+        page: 1, 
+        date:null,
+        category_id:null 
+      },
       items: [],
       totalItems: 0,
+      offset:0,
+      from:0,
+      to:0,
       last_page: 1,
       loading: false,
       headers: [
@@ -129,11 +138,18 @@ export default {
           this.totalItems = res.total;
           this.last_page = res.last_page;
           this.filter.page = Number(res.page);
-          this.filter.offset = res.offset;
+
+          this.offset = Number(res.offset);
+          this.from = Number(res.from);
+          this.to = Number(res.to);
 
       } catch (error) {
           this.items = [];
           this.totalItems = 0;
+
+          this.offset = 0;
+          this.from = 0;
+          this.to = 0;
       } finally {
           this.loading = false;
       }

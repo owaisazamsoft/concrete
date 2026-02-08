@@ -28,8 +28,10 @@ class SaleInvoiceService
         $query = SaleInvoice::leftJoin('users','users.id','=','sale_invoices.user_id')
           
             ->when($request->search, function ($q, $search) {
-                $q->where('sale_invoices.ref', 'like', "%{$search}%")
-                ->orWhere('sale_invoices.prefix', 'like', "%{$search}%");
+                 $q->where(function($q) use ($search){
+                    $q->where('sale_invoices.ref', 'like', "%{$search}%")
+                    ->orWhere('sale_invoices.prefix', 'like', "%{$search}%");
+                });
             })
             ->when($request->dc_id, function ($query, $value){
                 $query->whereExists(function ($sub) use ($value) {

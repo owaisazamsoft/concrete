@@ -3,33 +3,49 @@
     <v-col cols="12">
       <v-card title="Account Ledger" subtitle="View All Account Details">
         <v-card-text>
-   
-          <div class="d-flex flex-wrap pb-3 pt-3">
-            <v-select 
-              label="Length" 
-              v-model="filter.length" 
-              :items="[50, 500,1000]"  
-              max-width="100px"
-            />
-            <v-text-field
-              class="ml-2"
-              label="Search"
-              v-model="filter.search"
-              max-width="200px"
-              clearable
-              persistent-placeholder
-            />
-            <v-btn class="ml-2" color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
-     
-          </div>
+         <v-row class="d-flex flex-row py-3" align="center" no-gutters>
+            <v-col cols="auto" class="py-2">
+                <v-select 
+                  label="Length" 
+                  v-model="filter.length" 
+                  :items="generalStore.sort" 
+                  min-width="100px" 
+                  max-width="100px"
+                />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+              <v-text-field
+                class="ml-2"
+                label="Search"
+                v-model="filter.search"
+                min-width="200px"
+                max-width="200px"
+                clearable
+                persistent-placeholder
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+                <v-select label="Group" 
+                    v-model="filter.group"
+                    width="200px"
+                    :items="['customer','employe']"
+                    persistent-placeholder
+                    clearable />
+            </v-col>
+            <v-col cols="auto" class="py-2 px-1">
+              <v-btn class="ml-2" color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
+            </v-col>
+            <v-col cols="auto" class="py-2">
+                  Showing {{ from }} - {{ to }}   of {{ total}} Records
+            </v-col>
+          </v-row>
 
           <v-data-table-server class="border striped-table"
             :headers="headers"
             :items="items"
-            :items-length="totalItems"
+            :items-length="total"
             :loading="loading"
             item-value="id"
-            @update:options="loadItems"
           >
         
             <template #item.actions="{ item }">
@@ -53,26 +69,31 @@
 </template>
 
 <script>
-import customerLedger from "@/models/report.model";
+import generalModel from "@/models/general.model";
+import { useGeneralStore } from "@/stores/generalStore";
 
 export default {
   data() {
     return {
+      generalStore:useGeneralStore(),
       filter: {
         search: "",
-        length: 50,
+        length: 20,
         page: 1,
-        offset: 0,
+        group:null,
       },
+      offset:0,
       items: [],
-      totalItems: 0,
+      total: 0,
       last_page: 1,
       loading: false,
-
       headers: [
         { title: "ID", value: "id", sortable: false },
         { title: "Name", value: "firstName" },
+        { title: "Group", value: "group" },
         { title: "Phone", value: "phone" },
+        { title: "Address", value: "companyAddress1" },
+        
         { title: "Balance", value: "balance" },
         {title: "Actions", value: "actions", sortable: false },
       ],
@@ -80,36 +101,43 @@ export default {
   },
 
   mounted() {
+    
+    this.filter.length = this.generalStore.sort[0];
     this.loadItems();
   },
 
   methods: {
-    async loadItems(options = {}) {
+    async loadItems() {
+
       this.loading = true;
 
       try {
 
-        // ✅ datatable se page / items-per-page lena
-        // if (options.page) this.filter.page = options.page;
-        // if (options.itemsPerPage) this.filter.length = options.itemsPerPage;
+          const res = await generalModel.get("/api/reports/customerLedger",this.filter);
+          this.items = res.data ?? [];
+          this.total = res.total ?? 0;
+          this.last_page = res.last_page ?? 1;
+          this.filter.page = Number(res.page ?? 1);
 
-        const res = await customerLedger.all(this.filter);
+          this.to = Number(res.to);
+          this.from = Number(res.from);
+          this.offset = Number(res.offset);
+          
 
-        this.items = res.data ?? [];
-        this.totalItems = res.total ?? 0;
-        this.last_page = res.last_page ?? 1;
-        this.filter.page = Number(res.page ?? 1);
-        this.filter.offset = res.offset ?? 0;
+       
 
       } catch (error) {
           console.error(error);
           this.items = [];
-          this.totalItems = 0;
+          this.total = 0;
       } finally {
           this.loading = false;
       }
 
+
     },
+
+
   },
 };
 </script>

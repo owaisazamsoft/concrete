@@ -49,13 +49,18 @@
                 :to="`/user/payments/create`"></v-btn>
               </v-col>
               <v-col cols="auto" class="py-2">
-                Showing {{ filter.offset }}  of {{ totalItems}} Records
+                Showing {{ from }} - {{ to }}   of {{ totalItems}} Records
               </v-col>
           </v-row>
        
 
-          <v-data-table-server class="border striped-table" :headers="headers" :items="items" :items-length="totalItems"
-            :loading="loading" item-value="id" @update:options="loadItems">
+          <v-data-table-server class="border striped-table" 
+            :headers="headers" 
+            :items="items" 
+            :items-length="totalItems"
+            :loading="loading" 
+            item-value="id" 
+            >
             <template #item.image="{ item }">
               <v-img :src="item.image" width="60" height="50" contain></v-img>
             </template>
@@ -97,20 +102,22 @@ export default {
         length: null, 
         page: 1, 
         user_id:null,
-        offset: 0 
       },
       generalStore:useGeneralStore(),
       items: [],
       totalItems: 0,
       last_page: 1,
+      offset:0,
+      from:0,
+      to:0,
       loading: false,
       headers: [
-        { title: "ID", value: "id" },
-        { title: "Date", value: "date" },
-        { title: "Account", value: "firstName" },
-        { title: "Remarks", value: "remarks" },
-        { title: "Debit", value: "debit" },
-        { title: "Credit", value: "credit" },
+        { title: "ID", value: "id",sortable: false  },
+        { title: "Date", value: "date" , sortable: false  },
+        { title: "Account", value: "firstName" , sortable: false  },
+        { title: "Remarks", value: "remarks" , sortable: false  },
+        { title: "Debit", value: "debit" , sortable: false  },
+        { title: "Credit", value: "credit" , sortable: false  },
         { title: "Actions", value: "actions", sortable: false },
       ],
     };
@@ -128,7 +135,9 @@ export default {
         this.totalItems = res.total;
         this.last_page = res.last_page;
         this.filter.page = Number(res.page);
-        this.filter.offset = res.offset;
+        this.offset = Number(res.offset);
+        this.from = Number(res.from);
+        this.to = Number(res.to);
       } catch (error) {
         this.items = [];
         this.totalItems = 0;

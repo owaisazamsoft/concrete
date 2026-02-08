@@ -39,10 +39,7 @@
                                             />
                                      </v-col>
                                     <v-col cols="auto" class="py-2">
-                                        <!-- <div class="align-self-center px-2"> -->
-                                            Showing {{ filter.offset }}  of {{ totalItems}}
-                                            Records
-                                        <!-- </div> -->
+                                            Showing {{ from }} - {{ to }}   of {{ totalItems}} Records
                                     </v-col>
                                     <!-- <v-spacer /> -->
                                 </v-row>
@@ -52,7 +49,7 @@
                                     :items-length="totalItems" 
                                     :loading="loading" 
                                     item-value="id"
-                                    @update:options="loadItems">
+                                    >
 
                                     <template #item.img="{ item }">
                                     <v-img :src="item.image_preview" width="60" height="50" contain></v-img>
@@ -99,12 +96,14 @@ export default {
                 search: '',
                 length: null,
                 page: 1,
-                offset: 0,
                 group:null,
             },
             generalStore:useGeneralStore(),
             last_page: 1,
             items: [],
+            offset: 0,
+            from:0,
+            to:0,
             totalItems: 0,
             loading: false,
             headers: [
@@ -137,7 +136,9 @@ export default {
                 const res = await generalModel.get("/api/users",this.filter);
                 this.items = res.data;
                 this.totalItems = res.total;
-                this.filter.offset = res.offset;
+                this.offset = Number(res.offset);
+                this.to = Number(res.to);
+                this.from = Number(res.from);
                 this.filter.page = Number(res.page);
                 this.last_page = res.last_page;
 

@@ -3,33 +3,41 @@
     <v-col cols="12">
       <v-card title="Inventory" subtitle="View All Inventory Details">
         <v-card-text>
-   
-          <div class="d-flex flex-wrap pb-3 pt-3">
-            <v-select 
-              label="Length" 
-              v-model="filter.length" 
-              :items="[10, 20, 30]"  
-              max-width="100px"
-            />
-            <v-text-field
-              class="ml-2"
-              label="Search"
-              v-model="filter.search"
-              max-width="200"
-              clearable
-              persistent-placeholder
-            />
-            <v-btn class="ml-2" color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
-     
-          </div>
-
+          <v-row class="d-flex flex-row py-3" align="center" no-gutters>
+            <v-col cols="auto" class="py-2">
+              <v-select 
+                label="Length" 
+                v-model="filter.length" 
+                :items="generalStore.sort"  
+                max-width="100px"
+                min-width="100px"
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+              <v-text-field
+                class="ml-2"
+                label="Search"
+                v-model="filter.search"
+                max-width="200px"
+                min-width="200px"
+                clearable
+                persistent-placeholder
+              />
+            </v-col>
+            <v-col cols="auto" class="py-2">
+              <v-btn class="ml-2" color="primary" variant="flat" prepend-icon="mdi-magnify" @click="loadItems"></v-btn>
+            </v-col>
+            <v-col cols="auto" class="py-2">
+                  Showing {{ from }} - {{ to }}   of {{ total}} Records
+            </v-col>
+          </v-row>
+    
           <v-data-table-server class="border striped-table"
             :headers="headers"
             :items="items"
-            :items-length="totalItems"
+            :items-length="total"
             :loading="loading"
             item-value="id"
-            @update:options="loadItems"
           >
             <template #item.image="{ item }">
               <v-img :src="item.image" width="60" height="50" contain></v-img>
@@ -61,59 +69,62 @@
 </template>
 
 <script>
-import report from "@/models/report.model";
+import generalModel from "@/models/general.model";
+import { useGeneralStore } from "@/stores/generalStore";
 
 export default {
   data() {
     return {
+      generalStore:useGeneralStore(),
       filter: {
         search: "",
         length: 10,
         page: 1,
-        offset: 0,
       },
+      offset: 0,
+      from:0,
+      to:0,
       items: [],
-      totalItems: 0,
+      total: 0,
       last_page: 1,
       loading: false,
-
       headers: [
         { title: "ID", value: "id", sortable: false },
         { title: "Title", value: "title", sortable: false },
-        { title: "Sku", value: "sku" },
-        { title: "unit", value: "unit" },
-        { title: "category", value: "category" },
-        { title: "Stock", value: "balance" },
+        { title: "Sku", value: "sku" , sortable: false },
+        { title: "unit", value: "unit_name", sortable: false  },
+        { title: "category", value: "category_name", sortable: false  },
+        { title: "Stock", value: "balance", sortable: false  },
         {title: "Actions", value: "actions", sortable: false },
       ],
     };
   },
 
   mounted() {
+    this.filter.length = this.generalStore.sort[0];
     this.loadItems();
   },
 
   methods: {
-    async loadItems(options = {}) {
+    async loadItems() {
       this.loading = true;
 
       try {
 
-
-        const res = await report.inventory(this.filter);
-
-        this.items = res.data ?? [];
-        this.totalItems = res.total ?? 0;
-        this.last_page = res.last_page ?? 1;
-        this.filter.page = Number(res.page ?? 1);
-        this.filter.offset = res.offset ?? 0;
+          const res = await generalModel.get("/api/reports/inventory",this.filter);
+          this.items = res.data ?? [];
+          this.total = res.total ?? 0;
+          this.last_page = res.last_page ?? 1;
+          this.filter.page = Number(res.page ?? 1);
+          this.offset = Number(res.offset ?? 1);
+          this.from = Number(res.from ?? 0);
+          this.to = Number(res.to ?? 0);
 
       } catch (error) {
-        console.error(error);
-        this.items = [];
-        this.totalItems = 0;
+          this.items = [];
+          this.total = 0;
       } finally {
-        this.loading = false;
+          this.loading = false;
       }
     },
   },

@@ -44,6 +44,7 @@ class ReportService
             return $balance;
     }
 
+    
 
      public static function getCustomerLeder($customerId)
     {
@@ -64,13 +65,10 @@ class ReportService
 
             )->where('delivery_notes.user_id',$customerId);
 
-            
-
 
             $paymentsQuery = DB::table('payments')
             ->select(
                 'payments.id',
-                
 
                 'payments.date',
                 
@@ -90,37 +88,29 @@ class ReportService
     }
 
 
+
        public static function getInventoryLeder($id)
     {
 
-            // $billsQuery = DB::table('sale_invoices')
-            // ->select(
-            //     'sale_invoices.id',
-
-            //     'sale_invoices.date',
-                
-            //     DB::raw("'sale' AS type"),
-                
-            //     'sale_invoices.remarks',
-
-            //     DB::raw("0 AS credit"),
-                
-            //     'sale_invoices.total AS debit'
-
-            // )->where('sale_invoices.user_id',$customerId);
+            $billsQuery = DB::table('delivery_note_items')
+            ->join('delivery_notes','delivery_notes.id','=','delivery_note_items.delivery_note_id')
+            ->select(
+                DB::raw("CONCAT('dc_', delivery_note_items.id) AS unique_id"),
+                'delivery_notes.date',
+                DB::raw("'dc' AS type"),
+                'delivery_notes.remarks',                
+                DB::raw("0 AS stock_in"),
+                DB::raw("delivery_note_items.quantity AS stock_out"),
+            )->where('delivery_note_items.product_id',$id);
 
 
             $adjustmentQuery = DB::table('stock_adjustment')
             ->select(
-                'stock_adjustment.id',
-                
-
+                DB::raw("CONCAT('ad_', stock_adjustment.id) AS unique_id"),
                 'stock_adjustment.date',
-                
-                DB::raw("'Adjustment' AS type"),
-            
+                DB::raw("'ad' AS type"),
                 DB::raw("stock_adjustment.remarks"),
-
+                
                 DB::raw("CASE 
                     WHEN stock_adjustment.type = 'in' 
                     THEN stock_adjustment.qty 
@@ -135,7 +125,8 @@ class ReportService
                 
             )->where('stock_adjustment.product_id',$id);
 
-           return $adjustmentQuery;
+
+           return $adjustmentQuery->union($billsQuery);
            
     }
 
