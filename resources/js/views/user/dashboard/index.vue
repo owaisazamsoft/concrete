@@ -1,30 +1,18 @@
 <template>
   <v-container fluid>
-    <!-- <v-row>
-    
-      <v-col cols="12" sm="6" md="3" v-for="(value, key) in counter" :key="key">
-        <dashboard-card :title="value.title" :count="value.count" />
-      </v-col>
-    </v-row> -->
-
-
-    <!-- <v-row>
-      <v-col cols="12" md="12">
-        <v-card variant="elevated" elevation="5" color="background">
-          <v-container>
-            <h2>Sales Overview</h2>
-            <line-chart :chart-data="chartData" />
-          </v-container>
-        </v-card>
-      </v-col>
-    </v-row> -->
-  </v-container>
+      <v-row>    
+        <v-col cols="12" sm="6" md="3" v-for="(value, key) in counter" :key="key">
+          <dashboard-card :title="value.title" :count="value.count" />
+        </v-col>
+      </v-row>
+  </v-container> 
 </template>
 
 <script>
 import api from '@/plugins/axios';
 import DashboardCard from './DashboardCard.vue';
 import LineChart from './LineChart.vue';
+import generalModel from '@/models/general.model';
 
 export default {
   name: 'AuctionDashboard',
@@ -40,15 +28,15 @@ export default {
           count: 100,
         },
         products: {
-          title: 'Inventory',
+          title: 'Products',
           count: 100,
         },
-        invoices: {
-          title: 'Expense',
+        dc: {
+          title: 'Challan',
           count: 100,
         },
-        category: {
-          title: 'Category',
+        invoice: {
+          title: 'Invoice',
           count: 100,
         },
       },
@@ -66,5 +54,55 @@ export default {
       },
     };
   },
+  mounted(){
+    this.loadCounter();
+  },
+  methods:{
+
+    async loadCounter(){
+
+      try {
+
+          const res = await generalModel.get('/api/dashboard/counters');
+
+          console.log(res);
+          
+          this.counter.customers.count = res.user;
+          this.counter.products.count = res.product;
+          this.counter.dc.count = res.dc;
+          this.counter.invoice.count = res.invoice;
+
+      } catch (error) { 
+        this.counter.customers.count = 0;
+        this.counter.products.count = 0;
+        this.counter.dc.count = 0;
+        this.counter.invoice.count = 0;
+      }
+       
+    }
+  }
+  
+
 };
 </script>
+
+
+
+<style>
+.kpi-tile {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-tile:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+.kpi-tile .v-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+</style>

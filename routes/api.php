@@ -38,6 +38,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/changePassword', [AuthController::class, 'changePassword'])->middleware(['auth:sanctum']);
 });
 
+Route::get('/dashboard/counters', [DashboardController::class,'counters']);
+
 
 Route::apiResource('users', UserController::class);
 Route::apiResource('products', ProductController::class);
