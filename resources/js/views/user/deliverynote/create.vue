@@ -13,9 +13,7 @@
             <v-col cols="12" sm="4">
               <v-text-field v-model="form.date" type="date" label="Date"clearable persistent-placeholder=""/>
             </v-col>
-            <v-col cols="12" sm="4">
-              <v-text-field v-model="form.remarks" label="Remarks" clearable persistent-placeholder=""/>
-            </v-col>
+            
             <v-col cols="12" sm="4">
               <v-select
                 v-model="form.status"
@@ -32,6 +30,12 @@
                     label="Users" persistent-placeholder=""
                 />
             </v-col>
+            <v-col cols="12" sm="4">
+              <v-btn variant="flat" color="primary"  @click="genRem" >Generate Remarks</v-btn>
+            </v-col>
+            <v-col cols="12" sm="12">
+              <v-text-field v-model="form.remarks" label="Remarks" clearable persistent-placeholder=""/>
+            </v-col>
           </v-row>
       </v-card-text>
     </v-card>
@@ -42,7 +46,7 @@
                 :key="i"
                 class="mt-2 align-center" dense >
                 <v-col cols="12" md="3">
-                  <ProductDropdown
+                  <ProductDropdown 
                       :modelValue="item.product_id"
                       @update:value="handleProduct($event,{...item,key:i})"
                       item-title="title"
@@ -98,7 +102,7 @@
       </v-card-text>
     </v-card>
 
-    <div class="mt-3 text-center" >
+    <div class="mt-3 text-center">
         <v-btn color="primary" @click="submitForm">Save</v-btn>
     </div>
 
@@ -106,6 +110,7 @@
 </template>
 
 <script>
+
 import generaApi from "@/models/general.model"
 import UserDropdown from "@/components/UserDropdown.vue"
 import Config from "@/models/config.model";
@@ -139,6 +144,7 @@ export default {
   methods: {
     handleProduct(product,row){
       this.form.items[row.key].product_id = product.id;
+      this.form.items[row.key].name = product.title;
       this.form.items[row.key].price = product.price;
       this.handleCalculation();
     }, 
@@ -153,11 +159,23 @@ export default {
         this.form.items.push({
           product_id: null,
           quantity: 1,
+          name:'',
           price: 0,
           discount: 0,
           tax: 0,
           total:0,
         });
+    },
+    genRem(){
+
+        let remarks = "DELIVERED ";
+        this.form.items.forEach(element => {
+            let qty = String(element.quantity);
+            let and = this.form.items.length > 1 ? " AND " : '';
+            remarks += "("+qty+") Blocks "+element.name+and;
+        });
+        this.form.remarks = remarks;
+
     },
     removeItem(index) {
       this.form.items.splice(index, 1);

@@ -35,6 +35,12 @@
               disabled
             />
           </v-col>
+          <v-col cols="12" sm="4">
+              <v-btn variant="flat" color="primary"  @click="genRem" >Generate Remarks</v-btn>
+          </v-col>
+          <v-col cols="12" sm="12">
+              <v-text-field v-model="form.remarks" label="Remarks" clearable persistent-placeholder=""/>
+          </v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -113,6 +119,7 @@ import ProductDropdown from "@/components/productDropdown.vue";
 import UserDropdown from "@/components/UserDropdown.vue";
 import Config from "@/models/config.model";
 import generaApi from "@/models/general.model";
+import { toRaw } from "vue";
 
 export default {
   components: {
@@ -158,15 +165,38 @@ export default {
           user_id: res.data.user_id,
           items: res.data.items || [],
         };
+
+        const items = [];
+        if(res.data.items){
+            res.data.items.forEach(element => {
+              element.name = element?.product?.title;
+              items.push(element); 
+            });
+        }
+        this.form.items = items;
+    
+
       } catch (e) {
         console.error(e);
       } finally {
         this.loading = false;
       }
     },
+    genRem(){
+
+        let remarks = "DELIVERED ";
+        this.form.items.forEach(element => {
+            let qty = String(element.quantity);
+            let and = this.form.items.length > 1 ? " AND " : '';
+            remarks += "("+qty+") Blocks "+element.name+and;
+        });
+        this.form.remarks = remarks;
+
+    },
      handleProduct(product,row){
       this.form.items[row.key].product_id = product.id;
       this.form.items[row.key].price = product.price;
+      this.form.items[row.key].name = product.title;
       this.handleCalculation();
     }, 
     handleCalculation(){
