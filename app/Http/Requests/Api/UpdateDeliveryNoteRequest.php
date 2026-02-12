@@ -27,9 +27,10 @@ class UpdateDeliveryNoteRequest extends FormRequest
 
     public function rules()
     {
+        $id = $this->route('deliveryNote');
         return [
             'date' => 'required|date',
-            'ref' => 'required|string|max:1000',
+            'ref' => ['required','string','max:1000',Rule::unique('delivery_notes','ref')->ignore($id)],
             'status' => 'required|in:0,1',
             'items' => 'required|array|min:1',
             'items.*.product_id'    => 'required|integer|exists:products,id',

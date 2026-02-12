@@ -123,7 +123,6 @@ export default {
     UserDropdown,
     ProductDropdown
   },
-
   data() {
     return{
       config:Config,
@@ -154,6 +153,7 @@ export default {
       this.form.items.forEach( (item,key) => {
           this.form.items[key].total = item.price * item.quantity;
       });
+
     },   
     addItem() {
         this.form.items.push({

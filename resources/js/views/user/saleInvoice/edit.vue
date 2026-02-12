@@ -254,6 +254,7 @@ export default {
           let res = await generalModel.put("/api/saleInvoice/"+this.id,this.form)
           this.$alertStore.add(res.message,"success");
           this.loading = false;
+          this.$router.push("/user/saleInvoice");
       } catch (e) {
           this.$alertStore.add(e.message, "error");
           this.loading = false;

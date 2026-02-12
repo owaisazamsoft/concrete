@@ -228,9 +228,9 @@ export default {
           const updateUrl = `${this.url}/${id}`;
           const response = await generaApi.put(updateUrl,this.form);
           this.$alertStore.add(response.message, "success");
-          setTimeout(() => {
-            this.$router.push("/user/deliverynote");
-          }, 1000);
+          
+          this.$router.push("/user/deliverynote");
+        
 
       } catch (e) {
           this.$alertStore.add(e.message, "error");

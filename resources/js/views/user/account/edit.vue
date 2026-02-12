@@ -141,6 +141,7 @@ export default {
                 this.loadDataFromProfile();
                 this.loading = false;
                 this.$alertStore.add('Profile Updated', 'success');
+                this.$router.push('/user/account');
 
             }).catch((error) => {
                 this.loading = false;
